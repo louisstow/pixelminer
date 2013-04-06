@@ -7,8 +7,8 @@ var Map = {
 
 	//reference function for now
 	tileToChunkOffset: function (x, y) {
-		var cx = x / CHUNK_SIZE | 0;
-		var cy = y / CHUNK_SIZE | 0;
+		var cx = Math.floor(x / CHUNK_SIZE);
+		var cy = Math.floor(y / CHUNK_SIZE);
 
 		var offsetx = x - cx * CHUNK_SIZE;
 		var offsety = y - cy * CHUNK_SIZE;
@@ -34,11 +34,13 @@ var Map = {
 
 				var luck = Math.random();
 
-				if (layer === "LAND" && luck < 0.4) {
+				if (layer === "LAND" && luck < 0.01) {
 					Generator.tree(map, x, y);
 				}
 			}
 		}
+
+		return map;
 	},
 
 	initUserland: function (key) {

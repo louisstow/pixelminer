@@ -37,12 +37,7 @@ var Generator = {
 			for (starty = 0; starty < endy; ++starty) {
 				//leave some holes
 				if (Math.random() < 0.8) {
-					try {
-						matrix[startx + x][starty + y] = TileTypes.LEAVES;
-					} catch (e) {
-						console.log(e.stack);
-						debugger;
-					}
+					matrix[startx + x][starty + y] = TileTypes.LEAVES;					
 				}
 			}
 		}

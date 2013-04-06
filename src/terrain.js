@@ -30,12 +30,12 @@ var Terrain = {
 	},
 
 	threshold: {
-		DEEP_WATER: 0.2,
-		WATER: 0.4,
-		SHALLOW_WATER: 0.5,
-		BEACH: 0.6,
-		LAND: 0.8,
-		ROCK: 0.9,
+		DEEP_WATER: 0.36,
+		WATER: 0.40,
+		SHALLOW_WATER: 0.45,
+		BEACH: 0.48,
+		LAND: 0.60,
+		ROCK: 0.7,
 		SNOW: 1
 	},
 

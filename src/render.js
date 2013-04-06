@@ -2,7 +2,7 @@
 //setup the global canvas
 var globalCanvas = new Canvas({id: "canvas"})
 
-var SIZE = 18;
+var SIZE = 14;
 
 var w = 1 + globalCanvas.element.width / SIZE | 0;
 var h = 1 + globalCanvas.element.height / SIZE | 0;
@@ -11,6 +11,9 @@ var offscreen = new Canvas({
 	width: w,
 	height: h
 });
+
+offscreen.element.id = "minimap";
+document.body.appendChild(offscreen.element);
 
 var imgData = offscreen.context.createImageData(w, h);
 var data = imgData.data;
@@ -37,27 +40,27 @@ function generate (xref, yref) {
 			var grass = beach + 30;
 			var brown = grass + 30;
 			
-			if (gen < deepblue) { //deep blue
+			if (lvl < Terrain.threshold.DEEP_WATER) { //deep blue
 				r = 44;
 				g = 131;
 				b = 235;
-			} else if (gen < blue) { //blue
+			} else if (lvl < Terrain.threshold.WATER) { //blue
 				r = 54;
 				g = 141;
 				b = 255;
-			} else if (gen < lightblue) { //light blue
+			} else if (lvl < Terrain.threshold.SHALLOW_WATER) { //light blue
 				r = 146;
 				g = 180;
 				b = 255;
-			} else if (gen < beach) { //beach
+			} else if (lvl < Terrain.threshold.BEACH) { //beach
 				r = 255;
 				g = 231;
 				b = 54;			
-			} else if (gen < grass) { //grass
+			} else if (lvl < Terrain.threshold.LAND) { //grass
 				r = 100;
 				g = 200;
 				b = 50;
-			} else if (gen < brown) { //brown
+			} else if (lvl < Terrain.threshold.ROCK) { //brown
 				r = 118;
 				g = 118;
 				b = 118	;
@@ -73,7 +76,7 @@ function generate (xref, yref) {
 					g = 20;
 					b = 30;
 				}
-			} else if (gen < 255) { //snow
+			} else if (lvl < Terrain.threshold.SNOW) { //snow
 				r = 245;
 				g = 220;
 				b = 209;
@@ -90,8 +93,69 @@ function generate (xref, yref) {
 		}
 	}
 
+	drawChunks(data, xref, yref);
+
 	offscreen.context.putImageData(imgData, 0, 0);
 	globalCanvas.context.drawImage(offscreen.element, 0, 0, w, h, 0, 0, w * SIZE, h * SIZE);
+
+	
+}
+
+var TileColor = [
+	null,
+	{r: 255, g: 88, b: 7}, //wood
+	{r: 150, g: 140, b: 140}, //stone
+	{r: 0, g: 186, b: 0}, //dirt
+	{r: 148, g: 104, b: 28}, //trunk
+	{r: 37, g: 122, b: 16} //leaves
+]
+
+function drawChunks (data, x, y) {
+	//top left chunk
+	var cx0 = Math.floor(x / 64);
+	var cy0 = Math.floor(y / 64);
+
+	//bottom right chunk
+	var cx1 = Math.floor((x + w) / 64);
+	var cy1 = Math.floor((y + h) / 64);
+
+	//all the chunks inbetween
+	for (var cx = cx0; cx <= cx1; ++cx) {
+		for (var cy = cy0; cy <= cy1; ++cy) {
+			var chunk = Map.getChunk(1, cx, cy);
+
+			for (var relx = 0; relx < 64; ++relx) {
+				for (var rely = 0; rely < 64; ++rely) {
+					//got a block. now where to put it?
+					try {
+						if (chunk[relx][rely]) {
+							var realx = cx * 64 + relx;
+							var realy = cy * 64 + rely;
+
+							var pixelx = realx - x;
+							var pixely = realy - y;
+
+							if (pixelx >= w || pixely >= h || pixelx < 0 || pixely < 0)
+								continue;
+
+							var index = (pixely * w + pixelx) * 4;
+							var block = chunk[relx][rely];
+							var color = TileColor[block];
+
+							data[index] = color.r;
+							data[++index] = color.g;
+							data[++index] = color.b;
+							data[++index] = color.a || 255;
+						}
+					} catch(e) {
+						//debugger;
+					}
+				}
+			}
+		}
+	}
+
+	console.log(cx0, cy0, cx1, cy1)
 }
 
 function drawPlayer () {
