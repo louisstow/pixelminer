@@ -8,6 +8,8 @@ var TileTypes = {
 	DIRT: 3,
 	TRUNK: 4,
 	LEAVES: 5,
+	COAL: 6,
+	GOLD: 7
 };
 
 var Generator = {

@@ -63,26 +63,12 @@ function generate (xref, yref) {
 			} else if (lvl < Terrain.threshold.ROCK) { //brown
 				r = 118;
 				g = 118;
-				b = 118	;
-
-				var resource = Math.random();
-				if (resource < 0.02) {
-					r = 180;
-					g = 170;
-					b = 80;
-				} else if (resource < 0.1) {
-					//coal
-					r = 30;
-					g = 20;
-					b = 30;
-				}
+				b = 118;
 			} else if (lvl < Terrain.threshold.SNOW) { //snow
 				r = 245;
 				g = 220;
 				b = 209;
 			}
-
-			
 			
 			var diff = lvl * 150 - 75;
 			var dither = Math.random() * 10 - 5;
@@ -107,7 +93,9 @@ var TileColor = [
 	{r: 150, g: 140, b: 140}, //stone
 	{r: 0, g: 186, b: 0}, //dirt
 	{r: 148, g: 104, b: 28}, //trunk
-	{r: 37, g: 122, b: 16} //leaves
+	{r: 37, g: 122, b: 16}, //leaves
+	{r: 30, g: 20, b: 30}, //coal
+	{r: 180, g: 170, b: 80} //gold
 ]
 
 function drawChunks (data, x, y) {
@@ -142,9 +130,9 @@ function drawChunks (data, x, y) {
 							var block = chunk[relx][rely];
 							var color = TileColor[block];
 
-							data[index] = color.r;
-							data[++index] = color.g;
-							data[++index] = color.b;
+							data[index] = color.r * time;
+							data[++index] = color.g * time;
+							data[++index] = color.b * time;
 							data[++index] = color.a || 255;
 						}
 					} catch(e) {

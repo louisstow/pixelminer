@@ -33,7 +33,20 @@ var Map = {
 				var layer = Terrain.getLayer(lvl);
 
 				var luck = Math.random();
+				
+				//generate resources on rock
+				if (layer === "ROCK") {
 
+					if (luck < 0.1) {
+						map[x][y] = TileTypes.COAL;
+					}
+					
+					if (luck < 0.01) {
+						map[x][y] = TileTypes.GOLD;	
+					}
+				}
+
+				//generate trees on land
 				if (layer === "LAND" && luck < 0.01) {
 					Generator.tree(map, x, y);
 				}
