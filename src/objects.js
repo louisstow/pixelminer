@@ -11,20 +11,13 @@ var TileTypes = {
 };
 
 var Generator = {
-	matrix: [],
 
-	createMatrix: function (width, height) {
-		this.matrix.length = 0;
+	tree: function (matrix, x, y) {
+		var w = 5;
+		var h = 10;
 
-		for (var i = 0; i < width; ++i) {
-			this.matrix[i] = [];
-		}
-
-		return this.matrix;
-	},
-
-	tree: function () {
-		var matrix = this.createMatrix(5, 10);
+		if (x > (64 - w) || y > (64 - h))
+			return;
 
 		//start trunk
 		var startx = 2;
@@ -34,7 +27,7 @@ var Generator = {
 
 		
 		for (; starty >= endy; --starty) {
-			matrix[startx][starty] = TileTypes.TRUNK;
+			matrix[startx + x][starty + y] = TileTypes.TRUNK;
 		}
 
 		//start leaves
@@ -43,9 +36,14 @@ var Generator = {
 		for (startx = 0; startx <= endx; ++startx) {
 			for (starty = 0; starty < endy; ++starty) {
 				//leave some holes
-				console.log(startx, starty, endx, endy)
-				if (Math.random() < 0.8)
-					matrix[startx][starty] = TileTypes.LEAVES;
+				if (Math.random() < 0.8) {
+					try {
+						matrix[startx + x][starty + y] = TileTypes.LEAVES;
+					} catch (e) {
+						console.log(e.stack);
+						debugger;
+					}
+				}
 			}
 		}
 

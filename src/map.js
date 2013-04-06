@@ -15,11 +15,29 @@ var Map = {
 
 	},
 
-	generateTerrainChunk: function (key) {
+	generateTerrainChunk: function (key, cx, cy) {
 		var map = layer1[key] = [];
 
+		//initialise the array
 		for (var x = 0; x < CHUNK_SIZE; ++x) {
-			
+			map[x] = [];
+		}
+
+		//generate objects
+		for (var x = 0; x < CHUNK_SIZE; ++x) {
+			for (var y = 0; y < CHUNK_SIZE; ++y) {
+				var realx = cx * CHUNK_SIZE + x;
+				var realy = cy * CHUNK_SIZE + y;
+
+				var lvl = Terrain.generatePosition(realx, realy);
+				var layer = Terrain.getLayer(lvl);
+
+				var luck = Math.random();
+
+				if (layer === "LAND" && luck < 0.4) {
+					Generator.tree(map, x, y);
+				}
+			}
 		}
 	},
 
@@ -38,7 +56,7 @@ var Map = {
 		var chunk = map[key];
 
 		if (!chunk) {
-			var terrain = this.generateTerrainChunk(key);
+			var terrain = this.generateTerrainChunk(key, cx, cy);
 			var userland = this.initUserland(key);
 
 			//return the requested layer

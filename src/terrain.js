@@ -27,5 +27,40 @@ var Terrain = {
 		lvl = (lvl * 4 + lvl2 * 2 + lvl3) / 7;
 
 		return lvl;
+	},
+
+	threshold: {
+		DEEP_WATER: 0.2,
+		WATER: 0.4,
+		SHALLOW_WATER: 0.5,
+		BEACH: 0.6,
+		LAND: 0.8,
+		ROCK: 0.9,
+		SNOW: 1
+	},
+
+	getLayer: function (n) {
+		var threshold = Terrain.threshold;
+
+		if (n < threshold.DEEP_WATER)
+			return "DEEP_WATER";
+
+		if (n < threshold.WATER)
+			return "WATER";
+
+		if (n < threshold.SHALLOW_WATER)
+			return "SHALLOW_WATER";
+
+		if (n < threshold.BEACH)
+			return "BEACH";
+
+		if (n < threshold.LAND)
+			return "LAND";
+
+		if (n < threshold.ROCK)
+			return "ROCK";
+
+		if (n < threshold.SNOW)
+			return "SNOW";
 	}
 }
