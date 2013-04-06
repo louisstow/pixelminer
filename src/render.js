@@ -29,28 +29,35 @@ function generate (xref, yref) {
 			
 			var gen = lvl * 255 | 0;
 			var r = gen, b = gen, g = gen;
+
+			var deepblue = 70;
+			var blue = deepblue + 40;
+			var lightblue = blue + 10;
+			var beach = lightblue + 10;
+			var grass = beach + 30;
+			var brown = grass + 30;
 			
-			if (gen < 50) { //deep blue
+			if (gen < deepblue) { //deep blue
 				r = 44;
 				g = 131;
 				b = 235;
-			} else if (gen < 100) { //blue
+			} else if (gen < blue) { //blue
 				r = 54;
 				g = 141;
 				b = 255;
-			} else if (gen < 110) { //light blue
+			} else if (gen < lightblue) { //light blue
 				r = 146;
 				g = 180;
 				b = 255;
-			} else if (gen < 120) { //beach
+			} else if (gen < beach) { //beach
 				r = 255;
 				g = 231;
 				b = 54;			
-			} else if (gen < 160) { //grass
+			} else if (gen < grass) { //grass
 				r = 100;
 				g = 200;
 				b = 50;
-			} else if (gen < 195) { //brown
+			} else if (gen < brown) { //brown
 				r = 118;
 				g = 118;
 				b = 118	;
