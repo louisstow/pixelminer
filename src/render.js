@@ -190,21 +190,47 @@ var currenty = 0;
 var scrollx = 0;
 var scrolly = 0;
 
-var speed = 3;
+var speed = 2;
 generate(currentx, currenty);
 drawPlayer();
 
-window.addEventListener("keydown", function (e) {
-	if (e.keyCode === 37 || e.keyCode === 65)
-		scrollx -= speed;
-	if (e.keyCode === 39 || e.keyCode === 68)
-		scrollx += speed;
-	if (e.keyCode === 38 || e.keyCode === 87)
-		scrolly -= speed;
-	if (e.keyCode === 40 || e.keyCode === 83)
-		scrolly += speed;
+var isDown = {};
 
-	scrollTo(scrollx, scrolly);
-	//generate(currentx | 0, currenty | 0);
-	drawPlayer();
+Timer.tick(function () {
+	var moved = false;
+
+	if (isDown[37] || isDown[65]) {
+		scrollx -= speed;
+		moved = true;
+	}
+
+	if (isDown[39] || isDown[68]) {
+		scrollx += speed;
+		moved = true;
+	}
+
+	if (isDown[38] || isDown[87]) {
+		scrolly -= speed;
+		moved = true;
+	}
+
+	if (isDown[40] || isDown[83]) {
+		scrolly += speed;
+		moved = true;
+	}
+
+	if (moved) {
+		scrollTo(scrollx, scrolly);
+		drawPlayer();
+	}
+});
+
+window.addEventListener("keydown", function (e) {
+	isDown[e.keyCode] = true;
 }, false);
+
+window.addEventListener("keyup", function (e) {
+	delete isDown[e.keyCode];
+}, false);
+
+Timer.start();
