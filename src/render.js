@@ -4,8 +4,8 @@ var globalCanvas = new Canvas({id: "canvas"})
 
 var SIZE = 14;
 
-var w = 1 + globalCanvas.element.width / SIZE | 0;
-var h = 1 + globalCanvas.element.height / SIZE | 0;
+var w = 2 + globalCanvas.element.width / SIZE | 0;
+var h = 2 + globalCanvas.element.height / SIZE | 0;
 
 var offscreen = new Canvas({
 	width: w,
@@ -160,22 +160,59 @@ function drawPlayer () {
 	globalCanvas.context.fillRect(startx, starty + SIZE * 2, SIZE, SIZE);
 }
 
+function scrollTo (x, y) {
+	var doRender = false;
+
+	if (Math.floor(x / SIZE) !== currentx) {
+		currentx = Math.floor(x / SIZE);
+		doRender = true;
+	}
+
+	if (Math.floor(y / SIZE) !== currenty) {
+		currenty = Math.floor(y / SIZE);
+		doRender = true;
+	}
+	
+	if (doRender) { generate(currentx, currenty); }
+
+	
+	var modx = x % SIZE;
+	var mody = y % SIZE;
+
+	console.log("MOD", modx, mody)
+
+	var offsetx = -1 * ((SIZE + modx) % SIZE);
+	var offsety = -1 * ((SIZE + mody) % SIZE);
+
+	console.log("OFFSET", offsetx, offsety)
+
+	
+	//if (offsetx === 0) offsetx = 0;
+	//if (offsety === 0) offsety = SIZE;
+
+	globalCanvas.context.drawImage(offscreen.element, 0, 0, w, h, offsetx, offsety, w * SIZE, h * SIZE);
+}
+
 var currentx = 0;
 var currenty = 0;
-var speed = 1;
+var scrollx = 0;
+var scrolly = 0;
+
+var speed = 2;
 generate(currentx, currenty);
 drawPlayer();
 
 window.addEventListener("keydown", function (e) {
 	if (e.keyCode === 37 || e.keyCode === 65)
-		currentx -= speed;
+		scrollx -= speed;
 	if (e.keyCode === 39 || e.keyCode === 68)
-		currentx += speed;
+		scrollx += speed;
 	if (e.keyCode === 38 || e.keyCode === 87)
-		currenty -= speed;
+		scrolly -= speed;
 	if (e.keyCode === 40 || e.keyCode === 83)
-		currenty += speed;
+		scrolly += speed;
 
-	generate(currentx | 0, currenty | 0);
+	scrollTo(scrollx, scrolly);
+	//generate(currentx | 0, currenty | 0);
 	drawPlayer();
 }, false);
