@@ -179,16 +179,8 @@ function scrollTo (x, y) {
 	var modx = x % SIZE;
 	var mody = y % SIZE;
 
-	console.log("MOD", modx, mody)
-
 	var offsetx = -1 * ((SIZE + modx) % SIZE);
 	var offsety = -1 * ((SIZE + mody) % SIZE);
-
-	console.log("OFFSET", offsetx, offsety)
-
-	
-	//if (offsetx === 0) offsetx = 0;
-	//if (offsety === 0) offsety = SIZE;
 
 	globalCanvas.context.drawImage(offscreen.element, 0, 0, w, h, offsetx, offsety, w * SIZE, h * SIZE);
 }
@@ -198,7 +190,7 @@ var currenty = 0;
 var scrollx = 0;
 var scrolly = 0;
 
-var speed = 2;
+var speed = 3;
 generate(currentx, currenty);
 drawPlayer();
 
