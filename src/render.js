@@ -100,25 +100,25 @@ var TileColor = [
 
 function drawChunks (data, x, y) {
 	//top left chunk
-	var cx0 = Math.floor(x / 64);
-	var cy0 = Math.floor(y / 64);
+	var cx0 = Math.floor(x / CHUNK_SIZE);
+	var cy0 = Math.floor(y / CHUNK_SIZE);
 
 	//bottom right chunk
-	var cx1 = Math.floor((x + w) / 64);
-	var cy1 = Math.floor((y + h) / 64);
+	var cx1 = Math.floor((x + w) / CHUNK_SIZE);
+	var cy1 = Math.floor((y + h) / CHUNK_SIZE);
 
 	//all the chunks inbetween
 	for (var cx = cx0; cx <= cx1; ++cx) {
 		for (var cy = cy0; cy <= cy1; ++cy) {
 			var chunk = Map.getChunk(1, cx, cy);
 
-			for (var relx = 0; relx < 64; ++relx) {
-				for (var rely = 0; rely < 64; ++rely) {
+			for (var relx = 0; relx < CHUNK_SIZE; ++relx) {
+				for (var rely = 0; rely < CHUNK_SIZE; ++rely) {
 					//got a block. now where to put it?
 					try {
 						if (chunk[relx][rely]) {
-							var realx = cx * 64 + relx;
-							var realy = cy * 64 + rely;
+							var realx = cx * CHUNK_SIZE + relx;
+							var realy = cy * CHUNK_SIZE + rely;
 
 							var pixelx = realx - x;
 							var pixely = realy - y;

@@ -15,6 +15,14 @@ var Map = {
 
 	},
 
+	place: function (map, x, y, template, opts) {
+		for (var tx = 0; tx < template.length; ++tx) {
+			for (var ty = 0; ty < template[tx].length; ++ty) {
+				map[x + tx - (opts.anchorX || 0)][y + ty - (opts.anchorY || 0)] = template[tx][ty];
+			}
+		}
+	},
+
 	generateTerrainChunk: function (key, cx, cy) {
 		var map = layer1[key] = [];
 
@@ -26,30 +34,56 @@ var Map = {
 		//generate objects
 		for (var x = 0; x < CHUNK_SIZE; ++x) {
 			for (var y = 0; y < CHUNK_SIZE; ++y) {
+				//calculate the actual position in the world
 				var realx = cx * CHUNK_SIZE + x;
 				var realy = cy * CHUNK_SIZE + y;
 
+				//determine the terrain at this position
 				var lvl = Terrain.generatePosition(realx, realy);
 				var layer = Terrain.getLayer(lvl);
 
 				var luck = Math.random();
-				
+
+				for (var objname in Generator) {
+					var obj = Generator[objname];
+					var w = obj.width || 1;
+					var h = obj.height || 1;
+					var ax = obj.anchorX || 0;
+					var ay = obj.anchorY || 0;
+
+					//only plant if lucky enough
+					if (obj.luck < luck) { continue };
+
+					//must be the correct terrain layer
+					if (obj.placement.indexOf(layer) === -1) { continue };
+
+					//ensure the object will fit in the chunk
+					if (x - ax < 0 || y - ay < 0  ||
+						x + (w - ax) > CHUNK_SIZE ||
+						y + (h - ay) > CHUNK_SIZE) { continue; }
+
+					//execute the generate function
+					if (typeof obj.generate === "function") {
+						obj.generate(map, x, y);
+					}
+					else if (obj.template) {
+						//randomly select a template
+						var template = obj.template[obj.template.length * Math.random() | 0];
+						this.place(map, x, y, template, obj);
+					}
+				}
+
 				//generate resources on rock
-				if (layer === "ROCK") {
+				// if (layer === "ROCK") {
 
-					if (luck < 0.1) {
-						map[x][y] = TileTypes.COAL;
-					}
+				// 	if (luck < 0.1) {
+				// 		map[x][y] = TileTypes.COAL;
+				// 	}
 					
-					if (luck < 0.01) {
-						map[x][y] = TileTypes.GOLD;	
-					}
-				}
-
-				//generate trees on land
-				if (layer === "LAND" && luck < 0.01) {
-					Generator.tree(map, x, y);
-				}
+				// 	if (luck < 0.01) {
+				// 		map[x][y] = TileTypes.GOLD;	
+				// 	}
+				// }
 			}
 		}
 
