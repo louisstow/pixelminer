@@ -1,6 +1,8 @@
 var CHUNK_SIZE = 64;
 
 var layer1 = {};
+var metadata = {}; //chunk metadata
+
 var layer2 = {};
 
 var Map = {
@@ -25,6 +27,7 @@ var Map = {
 
 	generateTerrainChunk: function (key, cx, cy) {
 		var map = layer1[key] = [];
+		var metachunk = metadata[key] = [];
 
 		//initialise the array
 		for (var x = 0; x < CHUNK_SIZE; ++x) {
@@ -52,10 +55,10 @@ var Map = {
 					var ay = obj.anchorY || 0;
 
 					//only plant if lucky enough
-					if (obj.luck < luck) { continue };
+					if (obj.luck < luck) { continue; }
 
 					//must be the correct terrain layer
-					if (obj.placement.indexOf(layer) === -1) { continue };
+					if (obj.placement.indexOf(layer) === -1) { continue; }
 
 					//ensure the object will fit in the chunk
 					if (x - ax < 0 || y - ay < 0  ||
@@ -71,19 +74,16 @@ var Map = {
 						var template = obj.template[obj.template.length * Math.random() | 0];
 						this.place(map, x, y, template, obj);
 					}
+
+					metachunk.push({
+						x: x - ax,
+						y: y - ay,
+						w: w,
+						h: h,
+						realx: realx,
+						realy: realy
+					});
 				}
-
-				//generate resources on rock
-				// if (layer === "ROCK") {
-
-				// 	if (luck < 0.1) {
-				// 		map[x][y] = TileTypes.COAL;
-				// 	}
-					
-				// 	if (luck < 0.01) {
-				// 		map[x][y] = TileTypes.GOLD;	
-				// 	}
-				// }
 			}
 		}
 
@@ -113,6 +113,11 @@ var Map = {
 		}
 
 		return chunk;
+	},
+
+	getMetadata: function (cx, cy) {
+		var key = cx + "," + cy;
+		return metadata[key];
 	}
 
 };

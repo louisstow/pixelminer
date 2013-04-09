@@ -2,13 +2,17 @@ body {
 	text-align: center;
 }
 
-#canvas {
-	border: 5px solid #444;	
+#stage {
+	border: 5px solid #444;
+	position: relative;
+	width: 900px;
+	height: 550px;
+	margin: auto;
 }
 
 #minimap {
 	position: absolute;
-	left: 0;
-	top: 0;
+	left: -1px;
+	top: -1px;
 	border: 1px solid #444;
 }

@@ -13,7 +13,7 @@ var offscreen = new Canvas({
 });
 
 offscreen.element.id = "minimap";
-document.body.appendChild(offscreen.element);
+document.getElementById("stage").appendChild(offscreen.element);
 
 var imgData = offscreen.context.createImageData(w, h);
 var data = imgData.data;
@@ -79,11 +79,11 @@ function generate (xref, yref) {
 		}
 	}
 
-	drawChunks(data, xref, yref);
+	
 
 	offscreen.context.putImageData(imgData, 0, 0);
 	globalCanvas.context.drawImage(offscreen.element, 0, 0, w, h, 0, 0, w * SIZE, h * SIZE);
-
+	drawChunks(xref, yref);
 	
 }
 
@@ -96,9 +96,26 @@ var TileColor = [
 	{r: 37, g: 122, b: 16}, //leaves
 	{r: 30, g: 20, b: 30}, //coal
 	{r: 180, g: 170, b: 80} //gold
-]
+];
 
-function drawChunks (data, x, y) {
+var player = {
+	x: w / 2 | 0,
+	y: h / 2 | 0,
+	w: 1,
+	h: 3,
+	tag: "player",
+	color: "blue",
+	static: true
+};
+
+/**
+* 1. Loop over every visible chunk
+* 2. Create draw-list include the player obj
+* 3. Sort the draw-list by y + h
+* 4. Loop draw-list, loop the layer from start (x0,y0) to end (x1,y1)
+* 5. Render each tile with a fillRect
+*/
+function drawChunks (x, y) {
 	//top left chunk
 	var cx0 = Math.floor(x / CHUNK_SIZE);
 	var cy0 = Math.floor(y / CHUNK_SIZE);
@@ -112,39 +129,92 @@ function drawChunks (data, x, y) {
 		for (var cy = cy0; cy <= cy1; ++cy) {
 			var chunk = Map.getChunk(1, cx, cy);
 
-			for (var relx = 0; relx < CHUNK_SIZE; ++relx) {
-				for (var rely = 0; rely < CHUNK_SIZE; ++rely) {
-					//got a block. now where to put it?
-					try {
-						if (chunk[relx][rely]) {
-							var realx = cx * CHUNK_SIZE + relx;
-							var realy = cy * CHUNK_SIZE + rely;
+			//clone the draw list
+			var drawList = Map.getMetadata(cx, cy).slice(0);
+			drawList.push(player);
+			drawList.sort(function (a, b) {
+				return (a.y + a.h) - (b.y + b.h);
+			});
 
-							var pixelx = realx - x;
-							var pixely = realy - y;
-
-							if (pixelx >= w || pixely >= h || pixelx < 0 || pixely < 0)
-								continue;
-
-							var index = (pixely * w + pixelx) * 4;
-							var block = chunk[relx][rely];
-							var color = TileColor[block];
-
-							data[index] = color.r * time;
-							data[++index] = color.g * time;
-							data[++index] = color.b * time;
-							data[++index] = color.a || 255;
-						}
-					} catch(e) {
-						//debugger;
-					}
-				}
-			}
+			renderList(drawList, chunk, x, y, cx, cy);
 		}
 	}
 
 	console.log(cx0, cy0, cx1, cy1)
 }
+
+function renderList (drawList, chunk, x, y, cx, cy) {
+	for (var i = 0; i < drawList.length; ++i) {
+		renderObj(drawList[i], chunk, x, y, cx, cy);
+	}
+}
+
+function renderObj (obj, chunk, x, y, cx, cy) {
+	var oh = obj.y + obj.h;
+	var ow = obj.x + obj.w;
+
+	for (var ox = obj.x; ox < ow; ++ox) {
+		for (var oy = obj.y; oy < oh; ++oy) {
+			try {
+			var block = chunk[ox][oy];
+			} catch(e) { debugger }
+			//if (obj.tag && obj.tag === "player") debugger;
+			if (!block && !obj.color) { continue; }
+
+			if (obj.static) {
+				var pixelx = ox * SIZE;
+				var pixely = oy * SIZE;
+				console.log(pixelx, pixely)
+			} else {
+				var realx = cx * CHUNK_SIZE + ox;
+				var realy = cy * CHUNK_SIZE + oy;
+				var pixelx = (realx - x) * SIZE;
+				var pixely = (realy - y) * SIZE;
+			}
+
+			//	console.log(pixelx, realx, ox, x)
+			var color = TileColor[block] || obj.color;
+			if (typeof color === "object") {
+				color = "#" + color.r.toString(16) + color.g.toString(16) + color.b.toString(16);
+			}
+
+			globalCanvas.context.fillStyle = color;
+			globalCanvas.context.fillRect(pixelx, pixely, SIZE, SIZE);
+		}
+	}
+}
+
+// function drawChunk (data, chunk, x, y) {
+// 	for (var relx = 0; relx < CHUNK_SIZE; ++relx) {
+// 		for (var rely = 0; rely < CHUNK_SIZE; ++rely) {
+// 			//got a block. now where to put it?
+// 			try {
+// 				if (chunk[relx][rely]) {
+// 					var realx = cx * CHUNK_SIZE + relx;
+// 					var realy = cy * CHUNK_SIZE + rely;
+
+// 					var pixelx = realx - x;
+// 					var pixely = realy - y;
+
+// 					if (pixelx >= w || pixely >= h || pixelx < 0 || pixely < 0) {
+// 						continue;
+// 					}
+
+// 					var index = (pixely * w + pixelx) * 4;
+// 					var block = chunk[relx][rely];
+// 					var color = TileColor[block];
+
+// 					data[index] = color.r * time;
+// 					data[++index] = color.g * time;
+// 					data[++index] = color.b * time;
+// 					data[++index] = color.a || 255;
+// 				}
+// 			} catch(e) {
+// 				//debugger;
+// 			}
+// 		}
+// 	}
+// }
 
 function drawPlayer () {
 	var startx = (w * SIZE - SIZE) / 2;
@@ -173,8 +243,11 @@ function scrollTo (x, y) {
 		doRender = true;
 	}
 	
-	if (doRender) { generate(currentx, currenty); }
-
+	if (doRender) { 
+		generate(currentx, currenty); 
+	}
+	//player.x = currentx;
+	//player.y = currenty;
 	
 	var modx = x % SIZE;
 	var mody = y % SIZE;
@@ -183,6 +256,8 @@ function scrollTo (x, y) {
 	var offsety = -1 * ((SIZE + mody) % SIZE);
 
 	globalCanvas.context.drawImage(offscreen.element, 0, 0, w, h, offsetx, offsety, w * SIZE, h * SIZE);
+
+	drawChunks(currentx, currenty);
 }
 
 var currentx = 0;
@@ -192,7 +267,6 @@ var scrolly = 0;
 
 var speed = 2;
 generate(currentx, currenty);
-drawPlayer();
 
 var isDown = {};
 
@@ -221,7 +295,6 @@ Timer.tick(function () {
 
 	if (moved) {
 		scrollTo(scrollx, scrolly);
-		drawPlayer();
 	}
 });
 
