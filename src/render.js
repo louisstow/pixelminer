@@ -6,6 +6,12 @@ var SIZE = 14;
 
 var w = 2 + globalCanvas.element.width / SIZE | 0;
 var h = 2 + globalCanvas.element.height / SIZE | 0;
+var half_w = w / 2 | 0;
+var half_h = h / 2 | 0;
+var screen_w = globalCanvas.element.width;
+var screen_h = globalCanvas.element.height;
+var half_screen_w = screen_w / 2 | 0;
+var half_screen_h = screen_h / 2 | 0;
 
 var offscreen = new Canvas({
 	width: w,
@@ -98,16 +104,6 @@ var TileColor = [
 	{r: 180, g: 170, b: 80} //gold
 ];
 
-var player = {
-	x: w / 2 | 0,
-	y: h / 2 | 0,
-	w: 1,
-	h: 3,
-	tag: "player",
-	color: "blue",
-	static: true
-};
-
 /**
 * 1. Loop over every visible chunk
 * 2. Create draw-list include the player obj
@@ -124,56 +120,75 @@ function drawChunks (x, y) {
 	var cx1 = Math.floor((x + w) / CHUNK_SIZE);
 	var cy1 = Math.floor((y + h) / CHUNK_SIZE);
 
+	var drawList = [];
+
 	//all the chunks inbetween
 	for (var cx = cx0; cx <= cx1; ++cx) {
 		for (var cy = cy0; cy <= cy1; ++cy) {
-			var chunk = Map.getChunk(1, cx, cy);
+			console.log(cx, cy)
+			Map.getChunk(1, cx, cy);
 
 			//clone the draw list
-			var drawList = Map.getMetadata(cx, cy).slice(0);
-			drawList.push(player);
-			drawList.sort(function (a, b) {
-				return (a.y + a.h) - (b.y + b.h);
-			});
+			var copy = Map.getMetadata(cx, cy).slice(0);
+			drawList = drawList.concat(copy);
 
-			renderList(drawList, chunk, x, y, cx, cy);
+			if (!Player.drawn) {
+				drawList.push(Player);
+				Player.drawn = true;
+			}
 		}
 	}
 
-	console.log(cx0, cy0, cx1, cy1)
+	drawList.sort(function (a, b) {
+		//console.log((a.realy + a.h) - (b.realy + b.h), (a.realy + a.h), (b.realy + b.h), a.player, b.player)
+		return (a.realy + a.h) - (b.realy + b.h);
+	});
+
+	console.log(drawList);
+	try {
+		//throw
+	} catch (e) {
+		console.log(e.stack)
+	}
+
+	renderList(drawList, x, y);
+	//console.log(cx0, cy0, cx1, cy1)
 }
 
-function renderList (drawList, chunk, x, y, cx, cy) {
+function renderList (drawList, x, y) {
 	for (var i = 0; i < drawList.length; ++i) {
-		renderObj(drawList[i], chunk, x, y, cx, cy);
+		renderObj(drawList[i], x, y);
 	}
 }
 
-function renderObj (obj, chunk, x, y, cx, cy) {
+function renderObj (obj, x, y) {
 	var oh = obj.y + obj.h;
 	var ow = obj.x + obj.w;
+	
+	//execute the draw function instead
+	if (typeof obj.draw === "function") {
+		obj.draw(globalCanvas.context);
+		return;
+	}
+
+	var chunk = Map.getChunk(1, obj.cx, obj.cy);
 
 	for (var ox = obj.x; ox < ow; ++ox) {
 		for (var oy = obj.y; oy < oh; ++oy) {
-			try {
-			var block = chunk[ox][oy];
-			} catch(e) { debugger }
-			//if (obj.tag && obj.tag === "player") debugger;
+			//check the block exists in this chunk
+			var block = chunk[ox] && chunk[ox][oy];
+			
 			if (!block && !obj.color) { continue; }
+			
+			var realx = obj.cx * CHUNK_SIZE + ox;
+			var realy = obj.cy * CHUNK_SIZE + oy;
 
-			if (obj.static) {
-				var pixelx = ox * SIZE;
-				var pixely = oy * SIZE;
-				console.log(pixelx, pixely)
-			} else {
-				var realx = cx * CHUNK_SIZE + ox;
-				var realy = cy * CHUNK_SIZE + oy;
-				var pixelx = (realx - x) * SIZE;
-				var pixely = (realy - y) * SIZE;
-			}
+			var pixelx = (realx - x) * SIZE;
+			var pixely = (realy - y) * SIZE;
+		
 
-			//	console.log(pixelx, realx, ox, x)
 			var color = TileColor[block] || obj.color;
+			//convert to hash, prob better to set to rgb()
 			if (typeof color === "object") {
 				color = "#" + color.r.toString(16) + color.g.toString(16) + color.b.toString(16);
 			}
@@ -184,54 +199,10 @@ function renderObj (obj, chunk, x, y, cx, cy) {
 	}
 }
 
-// function drawChunk (data, chunk, x, y) {
-// 	for (var relx = 0; relx < CHUNK_SIZE; ++relx) {
-// 		for (var rely = 0; rely < CHUNK_SIZE; ++rely) {
-// 			//got a block. now where to put it?
-// 			try {
-// 				if (chunk[relx][rely]) {
-// 					var realx = cx * CHUNK_SIZE + relx;
-// 					var realy = cy * CHUNK_SIZE + rely;
-
-// 					var pixelx = realx - x;
-// 					var pixely = realy - y;
-
-// 					if (pixelx >= w || pixely >= h || pixelx < 0 || pixely < 0) {
-// 						continue;
-// 					}
-
-// 					var index = (pixely * w + pixelx) * 4;
-// 					var block = chunk[relx][rely];
-// 					var color = TileColor[block];
-
-// 					data[index] = color.r * time;
-// 					data[++index] = color.g * time;
-// 					data[++index] = color.b * time;
-// 					data[++index] = color.a || 255;
-// 				}
-// 			} catch(e) {
-// 				//debugger;
-// 			}
-// 		}
-// 	}
-// }
-
-function drawPlayer () {
-	var startx = (w * SIZE - SIZE) / 2;
-	var starty = (h / 2 | 0) * SIZE - SIZE;
-
-	globalCanvas.context.fillStyle = "red";
-	globalCanvas.context.fillRect(startx, starty, SIZE, SIZE);
-
-	globalCanvas.context.fillStyle = "pink";
-	globalCanvas.context.fillRect(startx, starty + SIZE, SIZE, SIZE);
-
-	globalCanvas.context.fillStyle = "grey";
-	globalCanvas.context.fillRect(startx, starty + SIZE * 2, SIZE, SIZE);
-}
-
-function scrollTo (x, y) {
+function scrollTo () {
 	var doRender = false;
+	var x = Player.realx - half_screen_w;
+	var y = Player.realy - half_screen_h;
 
 	if (Math.floor(x / SIZE) !== currentx) {
 		currentx = Math.floor(x / SIZE);
@@ -246,27 +217,32 @@ function scrollTo (x, y) {
 	if (doRender) { 
 		generate(currentx, currenty); 
 	}
-	//player.x = currentx;
-	//player.y = currenty;
+
+	Player.drawn = false;
 	
 	var modx = x % SIZE;
 	var mody = y % SIZE;
 
-	var offsetx = -1 * ((SIZE + modx) % SIZE);
-	var offsety = -1 * ((SIZE + mody) % SIZE);
+	offsetx = -1 * ((SIZE + modx) % SIZE);
+	offsety = -1 * ((SIZE + mody) % SIZE);
 
-	globalCanvas.context.drawImage(offscreen.element, 0, 0, w, h, offsetx, offsety, w * SIZE, h * SIZE);
+	globalCanvas.context.save();
+	globalCanvas.context.translate(offsetx, offsety);
+	globalCanvas.context.drawImage(offscreen.element, 0, 0, w, h, 0, 0, w * SIZE, h * SIZE);
 
 	drawChunks(currentx, currenty);
+	globalCanvas.context.restore();
 }
 
 var currentx = 0;
 var currenty = 0;
 var scrollx = 0;
 var scrolly = 0;
+var offsetx = 0;
+var offsety = 0;
 
 var speed = 2;
-generate(currentx, currenty);
+
 
 var isDown = {};
 
@@ -274,27 +250,27 @@ Timer.tick(function () {
 	var moved = false;
 
 	if (isDown[37] || isDown[65]) {
-		scrollx -= speed;
+		Player.realx -= speed;
 		moved = true;
 	}
 
 	if (isDown[39] || isDown[68]) {
-		scrollx += speed;
+		Player.realx += speed;
 		moved = true;
 	}
 
 	if (isDown[38] || isDown[87]) {
-		scrolly -= speed;
+		Player.realy -= speed;
 		moved = true;
 	}
 
 	if (isDown[40] || isDown[83]) {
-		scrolly += speed;
+		Player.realy += speed;
 		moved = true;
 	}
 
 	if (moved) {
-		scrollTo(scrollx, scrolly);
+		scrollTo();
 	}
 });
 

@@ -78,11 +78,14 @@ var Map = {
 					metachunk.push({
 						x: x - ax,
 						y: y - ay,
-						w: w,
-						h: h,
-						realx: realx,
-						realy: realy
+						w: w * SIZE,
+						h: h * SIZE,
+						cx: cx,
+						cy: cy,
+						realx: (cx * CHUNK_SIZE + (x - ax)) * SIZE,
+						realy: (cy * CHUNK_SIZE + (y - ay)) * SIZE
 					});
+					return map; //REMOVE ME
 				}
 			}
 		}
