@@ -45,7 +45,7 @@ var Generator = {
 			[[TileTypes.COAL]]
 		],
 		placement: ["ROCK"],
-		luck: 0.05
+		luck: 0.0
 	},
 
 	gold: {
@@ -53,6 +53,6 @@ var Generator = {
 			[[TileTypes.GOLD]]
 		],
 		placement: ["ROCK"],
-		luck: 0.005
+		luck: 0.0
 	}
 };

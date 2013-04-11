@@ -9,16 +9,20 @@
 <canvas id="canvas" width="900" height="550"></canvas>
 </div>
 
-<script src="./src/timer.js"></script>
-<script src="./src/blocks.js"></script>
-<script src="./src/perlin.js"></script>
-<script src="./src/terrain.js"></script>
-<script src="./src/canvas.js"></script>
-<script src="./src/objects.js"></script>
-<script src="./src/map.js"></script>
+<script src="./src/require.js"></script>
 
-<script src="./src/render.js"></script>
-<script src="./src/player.js"></script>
+<script type="text/javascript">
+require("./src/timer");
+require("./src/blocks");
+require("./src/perlin");
+require("./src/terrain");
+require("./src/canvas");
+require("./src/constants");
+require("./src/objects");
+require("./src/map");
+require("./src/player");
+require("./src/render");
+</script>
 
 </body>
 </html>

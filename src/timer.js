@@ -10,7 +10,7 @@ window.requestAnimFrame = (function(){
           };
 })();
 
-var FPS = 60;
+var FPS = 50;
 var loops = 0;
 var skipTicks = 1000 / FPS;
 var maxFrameSkip = 10; //maximum frames to drop
@@ -54,7 +54,7 @@ var Timer = {
 		this._ticks.push(cb);
 	},
 
-	render: function () {
+	render: function (cb) {
 		this._renders.push(cb);	
 	},
 

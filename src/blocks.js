@@ -48,3 +48,8 @@ var TileData = {
 		solid: true
 	}
 }
+
+exports = {
+	TileTypes: TileTypes,
+	TileData: TileData
+}

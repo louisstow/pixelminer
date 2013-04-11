@@ -26,3 +26,5 @@ var Canvas = function (opts) {
 		this.context.imageSmoothingEnabled = false;
 	}
 };
+
+exports = Canvas;

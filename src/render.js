@@ -1,17 +1,4 @@
 
-//setup the global canvas
-var globalCanvas = new Canvas({id: "canvas"})
-
-var SIZE = 14;
-
-var w = 2 + globalCanvas.element.width / SIZE | 0;
-var h = 2 + globalCanvas.element.height / SIZE | 0;
-var half_w = w / 2 | 0;
-var half_h = h / 2 | 0;
-var screen_w = globalCanvas.element.width;
-var screen_h = globalCanvas.element.height;
-var half_screen_w = screen_w / 2 | 0;
-var half_screen_h = screen_h / 2 | 0;
 
 var offscreen = new Canvas({
 	width: w,
@@ -89,7 +76,7 @@ function generate (xref, yref) {
 
 	offscreen.context.putImageData(imgData, 0, 0);
 	globalCanvas.context.drawImage(offscreen.element, 0, 0, w, h, 0, 0, w * SIZE, h * SIZE);
-	drawChunks(xref, yref);
+	
 	
 }
 
@@ -125,13 +112,24 @@ function drawChunks (x, y) {
 	//all the chunks inbetween
 	for (var cx = cx0; cx <= cx1; ++cx) {
 		for (var cy = cy0; cy <= cy1; ++cy) {
-			console.log(cx, cy)
 			Map.getChunk(1, cx, cy);
 
-			//clone the draw list
-			var copy = Map.getMetadata(cx, cy).slice(0);
-			drawList = drawList.concat(copy);
+			//clone the draw list 
+			var copy = Map.getMetadata(cx, cy);
 
+			for (var i = 0; i < copy.length; ++i) {
+				var obj = copy[i];
+				//console.log(obj.realx)
+				if (obj.realx < (Player.realx - half_screen_w) ||
+					obj.realy < (Player.realy - half_screen_h) ||
+					obj.realx > (Player.realx + half_screen_w) ||
+					obj.realy > (Player.realy + half_screen_h)) {
+					continue;
+				}
+				drawList.push(obj);
+			}
+
+			//only add to the list ONCE
 			if (!Player.drawn) {
 				drawList.push(Player);
 				Player.drawn = true;
@@ -139,27 +137,19 @@ function drawChunks (x, y) {
 		}
 	}
 
+	//sort based on pixel position
 	drawList.sort(function (a, b) {
-		//console.log((a.realy + a.h) - (b.realy + b.h), (a.realy + a.h), (b.realy + b.h), a.player, b.player)
 		return (a.realy + a.h) - (b.realy + b.h);
 	});
 
-	console.log(drawList);
-	try {
-		//throw
-	} catch (e) {
-		console.log(e.stack)
-	}
-
-	renderList(drawList, x, y);
-	//console.log(cx0, cy0, cx1, cy1)
-}
-
-function renderList (drawList, x, y) {
+	//console.log(drawList.length)
 	for (var i = 0; i < drawList.length; ++i) {
 		renderObj(drawList[i], x, y);
 	}
+
+	console.log(drawList.length)
 }
+
 
 function renderObj (obj, x, y) {
 	var oh = obj.y + obj.h;
@@ -185,7 +175,6 @@ function renderObj (obj, x, y) {
 
 			var pixelx = (realx - x) * SIZE;
 			var pixely = (realy - y) * SIZE;
-		
 
 			var color = TileColor[block] || obj.color;
 			//convert to hash, prob better to set to rgb()
@@ -268,10 +257,10 @@ Timer.tick(function () {
 		Player.realy += speed;
 		moved = true;
 	}
+});
 
-	if (moved) {
-		scrollTo();
-	}
+Timer.render(function () {
+	scrollTo();
 });
 
 window.addEventListener("keydown", function (e) {

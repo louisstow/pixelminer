@@ -5,6 +5,19 @@ var metadata = {}; //chunk metadata
 
 var layer2 = {};
 
+function checkIntersect (obj, existing) {
+	for (var i = 0; i < existing.length; ++i) {
+		var obj2 = existing[i];
+		
+		if (obj.x < (obj2.x + obj2._w) && 
+			(obj.x + obj._w) > obj2.x &&
+			obj.y < (obj2.y + obj2._h) &&
+			(obj.y + obj._h) > obj2.y) return true;
+	}
+
+	return false;
+}
+
 var Map = {
 
 	//reference function for now
@@ -49,10 +62,10 @@ var Map = {
 
 				for (var objname in Generator) {
 					var obj = Generator[objname];
-					var w = obj.width || 1;
-					var h = obj.height || 1;
-					var ax = obj.anchorX || 0;
-					var ay = obj.anchorY || 0;
+					var w = obj.w = obj.width || 1;
+					var h = obj.h = obj.height || 1;
+					var ax = obj.anchorX = obj.anchorX || 0;
+					var ay = obj.anchorY = obj.anchorY || 0;
 
 					//only plant if lucky enough
 					if (obj.luck < luck) { continue; }
@@ -64,6 +77,17 @@ var Map = {
 					if (x - ax < 0 || y - ay < 0  ||
 						x + (w - ax) > CHUNK_SIZE ||
 						y + (h - ay) > CHUNK_SIZE) { continue; }
+
+					//final check to see if placing this will not
+					//intersect existing objects
+					if (checkIntersect({
+							x: x - ax,
+							y: y - ay,
+							_w: w,
+							_h: h
+						}, metachunk)) {
+						continue;
+					}
 
 					//execute the generate function
 					if (typeof obj.generate === "function") {
@@ -78,6 +102,8 @@ var Map = {
 					metachunk.push({
 						x: x - ax,
 						y: y - ay,
+						_w: w,
+						_h: h,
 						w: w * SIZE,
 						h: h * SIZE,
 						cx: cx,
@@ -85,7 +111,7 @@ var Map = {
 						realx: (cx * CHUNK_SIZE + (x - ax)) * SIZE,
 						realy: (cy * CHUNK_SIZE + (y - ay)) * SIZE
 					});
-					return map; //REMOVE ME
+					//return map; //REMOVE ME
 				}
 			}
 		}
