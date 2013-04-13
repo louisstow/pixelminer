@@ -284,5 +284,7 @@ window.addEventListener("blur", function () {
 	isDown = {};
 }, false);
 
+//initalisiation stuff
 Timer.start();
+Math.seedrandom("hello.");
 scrollTo();

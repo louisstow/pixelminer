@@ -70,7 +70,7 @@ var Generator = {
 		width: 3,
 		height: 2,
 		placement: ["LAND"],
-		luck: 0.01,
+		luck: 0.02,
 
 		template: [
 			[[TileTypes.STEM], [null, TileTypes.STEM]],
