@@ -1,16 +1,18 @@
 var Player = {
 	x: 0, //x position in the world
 	y: 0, //y position in the world
-	realx: 0, //pixel position
-	realy: 0, //pixel position
-	w: SIZE,
-	h: SIZE * 3,
+	w: 1,
+	h: 3,
+	pixelX: 0, //pixel position
+	pixelY: 0, //pixel position
+	pixelW: SIZE,
+	pixelH: SIZE * 3,
 
 	player: true,
 
 	draw: function (ctx) {
-		var startx = (w * SIZE - SIZE) / 2 - offsetx;
-		var starty = (h / 2 | 0) * SIZE - SIZE - offsety;
+		var startx = half_screen_w - offsetx;
+		var starty = half_screen_h - offsety;
 		//console.log(startx, offsetx, starty, offsety)
 		ctx.fillStyle = "red";
 		ctx.fillRect(startx, starty, SIZE, SIZE);

@@ -9,10 +9,10 @@ function checkIntersect (obj, existing) {
 	for (var i = 0; i < existing.length; ++i) {
 		var obj2 = existing[i];
 		
-		if (obj.x < (obj2.x + obj2._w) && 
-			(obj.x + obj._w) > obj2.x &&
-			obj.y < (obj2.y + obj2._h) &&
-			(obj.y + obj._h) > obj2.y) return true;
+		if (obj.x < (obj2.x + obj2.w) && 
+			(obj.x + obj.w) > obj2.x &&
+			obj.y < (obj2.y + obj2.h) &&
+			(obj.y + obj.h) > obj2.y) return true;
 	}
 
 	return false;
@@ -83,8 +83,8 @@ var Map = {
 					if (checkIntersect({
 							x: x - ax,
 							y: y - ay,
-							_w: w,
-							_h: h
+							w: w,
+							h: h
 						}, metachunk)) {
 						continue;
 					}
@@ -102,14 +102,15 @@ var Map = {
 					metachunk.push({
 						x: x - ax,
 						y: y - ay,
-						_w: w,
-						_h: h,
-						w: w * SIZE,
-						h: h * SIZE,
+						w: w,
+						h: h,
+						pixelW: w * SIZE,
+						pixelH: h * SIZE,
 						cx: cx,
 						cy: cy,
-						realx: (cx * CHUNK_SIZE + (x - ax)) * SIZE,
-						realy: (cy * CHUNK_SIZE + (y - ay)) * SIZE
+						pixelX: (cx * CHUNK_SIZE + (x - ax)) * SIZE,
+						pixelY: (cy * CHUNK_SIZE + (y - ay)) * SIZE,
+						uuid: (Math.random() * 2000 | 0).toString(16)
 					});
 					//return map; //REMOVE ME
 				}

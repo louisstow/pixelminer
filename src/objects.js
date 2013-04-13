@@ -18,7 +18,6 @@ var Generator = {
 			var starty = 9;
 			var endx;
 			var endy = randRange(4, 6) | 0;
-
 			
 			for (; starty >= endy; --starty) {
 				matrix[startx + x - this.anchorX][starty + y - this.anchorY] = TileTypes.TRUNK;

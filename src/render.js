@@ -120,10 +120,10 @@ function drawChunks (x, y) {
 			for (var i = 0; i < copy.length; ++i) {
 				var obj = copy[i];
 				//console.log(obj.realx)
-				if (obj.realx < (Player.realx - half_screen_w) ||
-					obj.realy < (Player.realy - half_screen_h) ||
-					obj.realx > (Player.realx + half_screen_w) ||
-					obj.realy > (Player.realy + half_screen_h)) {
+				if (obj.pixelX < (Player.pixelX - half_screen_w) ||
+					obj.pixelY < (Player.pixelY - half_screen_h) ||
+					obj.pixelX > (Player.pixelX + half_screen_w) ||
+					obj.pixelY > (Player.pixelY + half_screen_h)) {
 					continue;
 				}
 				drawList.push(obj);
@@ -139,15 +139,13 @@ function drawChunks (x, y) {
 
 	//sort based on pixel position
 	drawList.sort(function (a, b) {
-		return (a.realy + a.h) - (b.realy + b.h);
+		return (a.pixelY + a.pixelH) - (b.pixelY + b.pixelH);
 	});
 
 	//console.log(drawList.length)
 	for (var i = 0; i < drawList.length; ++i) {
 		renderObj(drawList[i], x, y);
 	}
-
-	console.log(drawList.length)
 }
 
 
@@ -190,8 +188,8 @@ function renderObj (obj, x, y) {
 
 function scrollTo () {
 	var doRender = false;
-	var x = Player.realx - half_screen_w;
-	var y = Player.realy - half_screen_h;
+	var x = Player.pixelX - half_screen_w;
+	var y = Player.pixelY - half_screen_h;
 
 	if (Math.floor(x / SIZE) !== currentx) {
 		currentx = Math.floor(x / SIZE);
@@ -234,33 +232,41 @@ var speed = 2;
 
 
 var isDown = {};
+var moved = true;
 
 Timer.tick(function () {
-	var moved = false;
+	moved = false;
 
 	if (isDown[37] || isDown[65]) {
-		Player.realx -= speed;
+		Player.pixelX -= speed;
 		moved = true;
 	}
 
 	if (isDown[39] || isDown[68]) {
-		Player.realx += speed;
+		Player.pixelX += speed;
 		moved = true;
 	}
 
 	if (isDown[38] || isDown[87]) {
-		Player.realy -= speed;
+		Player.pixelY -= speed;
 		moved = true;
 	}
 
 	if (isDown[40] || isDown[83]) {
-		Player.realy += speed;
+		Player.pixelY += speed;
 		moved = true;
 	}
 });
 
+function getCurrentChunk () {
+	console.log(
+		Math.floor(currentx / CHUNK_SIZE),
+		Math.floor(currenty / CHUNK_SIZE)
+	);
+}
+
 Timer.render(function () {
-	scrollTo();
+	if (moved) scrollTo();
 });
 
 window.addEventListener("keydown", function (e) {
