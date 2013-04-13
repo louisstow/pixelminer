@@ -13,7 +13,7 @@ window.requestAnimFrame = (function(){
 var FPS = 50;
 var loops = 0;
 var skipTicks = 1000 / FPS;
-var maxFrameSkip = 10; //maximum frames to drop
+var maxFrameSkip = 2; //maximum frames to drop
 var nextGameTick = Date.now();
 var lastGameTick = null;
 
@@ -45,7 +45,7 @@ var Timer = {
 			loops++;
 		}
 
-		if (loops == maxFrameSkip) {
+		if (loops >= maxFrameSkip) {
 			nextGameTick = now;
 		}
 

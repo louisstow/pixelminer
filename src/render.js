@@ -64,7 +64,9 @@ function generate (xref, yref) {
 			}
 			
 			var diff = lvl * 150 - 75;
+
 			var dither = Math.random() * 10 - 5;
+
 			data[index] = (r + diff + dither) * time;
 			data[++index] = (g + diff  + dither) * time;
 			data[++index] = (b + diff + dither) * time
@@ -286,5 +288,5 @@ window.addEventListener("blur", function () {
 
 //initalisiation stuff
 Timer.start();
-Math.seedrandom("hello.");
+Math.seedrandom("Youre always holding onto stars");
 scrollTo();
