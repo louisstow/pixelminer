@@ -6,7 +6,10 @@ var TileName = [
 	"TRUNK",
 	"LEAVES",
 	"COAL",
-	"GOLD"
+	"GOLD",
+	"ROSE",
+	"STEM",
+	"TULIP"
 ];
 
 var TileTypes = {
@@ -16,7 +19,10 @@ var TileTypes = {
 	TRUNK: 4,
 	LEAVES: 5,
 	COAL: 6,
-	GOLD: 7
+	GOLD: 7,
+	ROSE: 8,
+	STEM: 9,
+	TULIP: 10
 };
 
 var TileData = {
@@ -47,9 +53,4 @@ var TileData = {
 	GOLD: {
 		solid: true
 	}
-}
-
-exports = {
-	TileTypes: TileTypes,
-	TileData: TileData
 }

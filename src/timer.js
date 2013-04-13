@@ -45,6 +45,10 @@ var Timer = {
 			loops++;
 		}
 
+		if (loops == maxFrameSkip) {
+			nextGameTick = now;
+		}
+
 		if (loops) {
 			Timer.doRender();
 		}

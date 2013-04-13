@@ -112,7 +112,6 @@ var Map = {
 						pixelY: (cy * CHUNK_SIZE + (y - ay)) * SIZE,
 						uuid: (Math.random() * 2000 | 0).toString(16)
 					});
-					//return map; //REMOVE ME
 				}
 			}
 		}

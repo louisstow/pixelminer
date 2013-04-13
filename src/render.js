@@ -88,7 +88,10 @@ var TileColor = [
 	{r: 148, g: 104, b: 28}, //trunk
 	{r: 37, g: 122, b: 16}, //leaves
 	{r: 30, g: 20, b: 30}, //coal
-	{r: 180, g: 170, b: 80} //gold
+	{r: 180, g: 170, b: 80}, //gold
+	{r: 224, g: 27, b: 106}, //flower
+	{r: 57, g: 152, b: 36}, //stem
+	{r: 222, g: 242, b: 0} //tulip
 ];
 
 /**
@@ -120,8 +123,8 @@ function drawChunks (x, y) {
 			for (var i = 0; i < copy.length; ++i) {
 				var obj = copy[i];
 				//console.log(obj.realx)
-				if (obj.pixelX < (Player.pixelX - half_screen_w) ||
-					obj.pixelY < (Player.pixelY - half_screen_h) ||
+				if (obj.pixelX + obj.pixelW < (Player.pixelX - half_screen_w) ||
+					obj.pixelY + obj.pixelH < (Player.pixelY - half_screen_h) ||
 					obj.pixelX > (Player.pixelX + half_screen_w) ||
 					obj.pixelY > (Player.pixelY + half_screen_h)) {
 					continue;
@@ -177,7 +180,7 @@ function renderObj (obj, x, y) {
 			var color = TileColor[block] || obj.color;
 			//convert to hash, prob better to set to rgb()
 			if (typeof color === "object") {
-				color = "#" + color.r.toString(16) + color.g.toString(16) + color.b.toString(16);
+				color = "rgb(" + color.r + "," + color.g + "," + color.b + ")";
 			}
 
 			globalCanvas.context.fillStyle = color;
@@ -277,4 +280,9 @@ window.addEventListener("keyup", function (e) {
 	delete isDown[e.keyCode];
 }, false);
 
+window.addEventListener("blur", function () {
+	isDown = {};
+}, false);
+
 Timer.start();
+scrollTo();

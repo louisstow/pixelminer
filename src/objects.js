@@ -44,7 +44,7 @@ var Generator = {
 			[[TileTypes.COAL]]
 		],
 		placement: ["ROCK"],
-		luck: 0.0
+		luck: 0.01
 	},
 
 	gold: {
@@ -52,6 +52,30 @@ var Generator = {
 			[[TileTypes.GOLD]]
 		],
 		placement: ["ROCK"],
-		luck: 0.0
+		luck: 0.001
+	},
+
+	flower: {
+		template: [
+			[[TileTypes.ROSE, TileTypes.STEM]],
+			[[TileTypes.TULIP, TileTypes.STEM]]
+		],
+		placement: ["LAND"],
+		luck: 0.005,
+		width: 2,
+		height: 2
+	},
+
+	grass: {
+		width: 3,
+		height: 2,
+		placement: ["LAND"],
+		luck: 0.01,
+
+		template: [
+			[[TileTypes.STEM], [null, TileTypes.STEM]],
+			[[null, TileTypes.STEM], [TileTypes.STEM, null]],
+			[[TileTypes.STEM], [null, TileTypes.STEM], [TileTypes.STEM]]
+		]	
 	}
 };
