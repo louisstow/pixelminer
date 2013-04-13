@@ -288,5 +288,4 @@ window.addEventListener("blur", function () {
 
 //initalisiation stuff
 Timer.start();
-Math.seedrandom("Youre always holding onto stars");
 scrollTo();
