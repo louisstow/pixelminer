@@ -14,9 +14,6 @@ document.getElementById("stage").appendChild(offscreen.element);
 var imgData = offscreen.context.createImageData(w, h);
 var data = imgData.data;
 
-//unit time of day 0 to 1 exclusive.
-var time = 0.9;
-
 function generate (xref, yref) {
 	var shift = Math.random() * 200 | 0;
 	for (var x = 0; x < w; ++x) {
@@ -71,9 +68,9 @@ function generate (xref, yref) {
 			var noisekey = Math.abs((x + xref) * (y + yref)) % noise.length;
 			var dither = noise[noisekey] * 10 - 5;
 
-			data[index] = (r + diff + dither) * time;
-			data[++index] = (g + diff  + dither) * time;
-			data[++index] = (b + diff + dither) * time
+			data[index] = (r + diff + dither);
+			data[++index] = (g + diff  + dither);
+			data[++index] = (b + diff + dither);
 			data[++index] = 255;
 		}
 	}
