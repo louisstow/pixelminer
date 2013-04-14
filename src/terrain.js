@@ -1,9 +1,15 @@
 //this value scales the perline noise. The bigger the number
 //the bigger the terrain.
-var SCALE = 90; 
+var SCALE = 90;
+
+var terrainCache = {};
 
 var Terrain = {
 	generatePosition: function (x, y) {
+		var key = x + "," + y;
+		if (terrainCache[key])
+			return terrainCache[key];
+
 		var lvl = PerlinNoise.noise(
 			x / SCALE * 1.5, 
 			y / SCALE * 1.5,
@@ -26,6 +32,7 @@ var Terrain = {
 		//on the first layer
 		lvl = (lvl * 4 + lvl2 * 2 + lvl3) / 7;
 
+		terrainCache[key] = lvl;
 		return lvl;
 	},
 

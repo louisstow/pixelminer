@@ -1,4 +1,7 @@
-
+var noise = [];
+for (var x = 0; x < 200; ++x) {
+	noise[x] = Math.random();
+}
 
 var offscreen = new Canvas({
 	width: w,
@@ -65,7 +68,8 @@ function generate (xref, yref) {
 			
 			var diff = lvl * 150 - 75;
 
-			var dither = Math.random() * 10 - 5;
+			var noisekey = Math.abs((x + xref) * (y + yref)) % noise.length;
+			var dither = noise[noisekey] * 10 - 5;
 
 			data[index] = (r + diff + dither) * time;
 			data[++index] = (g + diff  + dither) * time;
