@@ -15,4 +15,5 @@ body {
 	left: -1px;
 	top: -1px;
 	border: 1px solid #444;
+	display: none;
 }
