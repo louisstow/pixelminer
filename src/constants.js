@@ -2,7 +2,7 @@
 var globalCanvas = new Canvas({id: "canvas"})
 
 
-var SIZE = 14;
+var SIZE = 18;
 var w = 2 + globalCanvas.element.width / SIZE | 0;
 var h = 2 + globalCanvas.element.height / SIZE | 0;
 var half_w = w / 2 | 0;
