@@ -16,7 +16,7 @@ var colors = {
 	day: {r: 253, g: 94, b: 83, a: 0}
 };
 
-var time = 0; //start at midnight
+var time = 180000; //start at midnight
 var day = (1000 * 60) * 10; //10 minutes
 var inc = 500; //increment the day
 var divider = day / 24; //divide into 24 hours

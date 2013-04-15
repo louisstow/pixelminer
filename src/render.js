@@ -1,5 +1,5 @@
 var noise = [];
-for (var x = 0; x < 200; ++x) {
+for (var x = 0; x < 50; ++x) {
 	noise[x] = Math.random();
 }
 
