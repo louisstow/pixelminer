@@ -25,3 +25,30 @@ body {
 	right: 0;
 	bottom: 0;
 }
+
+#inventory {
+	height: 80px;
+	position: absolute;
+	bottom: -2px;
+	left: 80px;
+	right: 80px;
+
+	border: 2px solid #444;
+	background: #ccc;
+	z-index: 10;
+}
+
+#inventory .placeholder {
+	width: 66px;
+	height: 65px;
+	float: left;
+	margin: 8px 0 0px 7px;
+	background: #aaa;
+	box-shadow: 1px 1px 0 1px #eee;
+}
+
+#inventory .placeholder.active {
+	border: 2px solid #222;
+	margin-left: 4px;
+	margin-top: 6px;
+}

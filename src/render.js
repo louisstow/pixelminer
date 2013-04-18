@@ -272,10 +272,22 @@ function getCurrentChunk () {
 }
 
 Timer.render(function () {
-	if (moved) scrollTo();
+	if (moved) {
+		scrollTo();
+	}
 });
 
 window.addEventListener("keydown", function (e) {
+	console.log(e.keyCode)
+	if (e.keyCode >= 48 && e.keyCode <= 57) {
+		var n = e.keyCode - 49;
+		if (n === -1) n = 9;
+		Inventory.selectQuick(n);
+	}
+
+	if (e.keyCode === 69) Inventory.selectQuick(++Inventory._selected);
+	if (e.keyCode === 81) Inventory.selectQuick(--Inventory._selected);
+
 	isDown[e.keyCode] = true;
 }, false);
 

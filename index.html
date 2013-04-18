@@ -6,6 +6,7 @@
 <body>
 
 <div id="stage">
+<div id="inventory"></div>
 <div id="time"></div>
 <canvas id="canvas" width="900" height="550"></canvas>
 </div>
@@ -15,6 +16,7 @@
 <script type="text/javascript">
 require("./lib/seedrandom")
 require("./lib/perlin");
+require("./lib/Spineless");
 
 require("./src/time");
 require("./src/timer");
@@ -25,6 +27,8 @@ require("./src/constants");
 require("./src/objects");
 require("./src/map");
 require("./src/player");
+require("./src/item");
+require("./src/inventory");
 require("./src/render");
 
 </script>
