@@ -9,24 +9,47 @@ var inner_padding = 10;
 var InventoryView = Spineless.View.extend({
 	template: "inventory",
 
-	selectQuick: function (index) {
+	init: function () {
+		InventoryView.super(this, "init", arguments);
+
+		//if child clicks deselect all
+		this.on("dom:*", function (e, obj) {
+			this.deselectQuick();
+			Inventory._selected = obj.model.index;
+		});
+	},
+
+	selectQuick: function (index) {			
+		this.deselectQuick();
+		this.children[index].select();
+	},
+
+	deselectQuick: function () {
 		for (var i = 0; i < this.children.length; ++i) {
 			this.children[i].deselect();
 		}
-
-		this.children[index].select();
 	}
 });
 
 var ItemView = Spineless.View.extend({
+	defaults: {
+		index: 0
+	},
+
 	template: [
 		{id: "placeholder", className: "placeholder", children: [
 			{id: "icon", className: "icon"}
 		]}
 	],
 
-	select: function (index) {
-		this.placeholder.classList.add("active")
+	events: {
+		"click placeholder": "select"
+	},
+
+	select: function (e) {
+		this.placeholder.classList.add("active");
+		e && e.stopPropagation();
+		return false;
 	},
 
 	deselect: function () {
@@ -48,7 +71,10 @@ Inventory = {
 
 	init: function () {
 		for (var x = 0; x < this._slots; ++x) {
-			this._placeholder[x] = new ItemView();
+			this._placeholder[x] = new ItemView({
+				index: x
+			});
+
 			inventory.addChild(this._placeholder[x]);
 		}
 

@@ -25,4 +25,8 @@ var Player = {
 	}
 }
 
-scrollTo();
+Input.onSelect(function (x, y) {
+	x += Player.pixelX;
+	y += Player.pixelY;
+	Map.getTileAtPoint(x, y);
+});

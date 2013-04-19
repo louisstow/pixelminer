@@ -237,28 +237,27 @@ var offsety = 0;
 var speed = 2;
 
 
-var isDown = {};
 var moved = true;
 
 Timer.tick(function () {
 	moved = false;
 
-	if (isDown[37] || isDown[65]) {
+	if (Input.isDown[Key.A] || Input.isDown[Key.LEFT]) {
 		Player.pixelX -= speed;
 		moved = true;
 	}
 
-	if (isDown[39] || isDown[68]) {
+	if (Input.isDown[Key.D] || Input.isDown[Key.RIGHT]) {
 		Player.pixelX += speed;
 		moved = true;
 	}
 
-	if (isDown[38] || isDown[87]) {
+	if (Input.isDown[Key.W] || Input.isDown[Key.UP]) {
 		Player.pixelY -= speed;
 		moved = true;
 	}
 
-	if (isDown[40] || isDown[83]) {
+	if (Input.isDown[Key.S] || Input.isDown[Key.DOWN]) {
 		Player.pixelY += speed;
 		moved = true;
 	}
@@ -277,27 +276,6 @@ Timer.render(function () {
 	}
 });
 
-window.addEventListener("keydown", function (e) {
-	console.log(e.keyCode)
-	if (e.keyCode >= 48 && e.keyCode <= 57) {
-		var n = e.keyCode - 49;
-		if (n === -1) n = 9;
-		Inventory.selectQuick(n);
-	}
-
-	if (e.keyCode === 69) Inventory.selectQuick(++Inventory._selected);
-	if (e.keyCode === 81) Inventory.selectQuick(--Inventory._selected);
-
-	isDown[e.keyCode] = true;
-}, false);
-
-window.addEventListener("keyup", function (e) {
-	delete isDown[e.keyCode];
-}, false);
-
-window.addEventListener("blur", function () {
-	isDown = {};
-}, false);
 
 //initalisiation stuff
 Timer.start();

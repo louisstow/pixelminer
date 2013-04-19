@@ -147,6 +147,18 @@ var Map = {
 	getMetadata: function (cx, cy) {
 		var key = cx + "," + cy;
 		return metadata[key];
+	},
+
+	getTileAtPoint: function (x, y) {
+		var tx = Math.floor(x / SIZE);
+		var ty = Math.floor(y / SIZE);
+		var cx = Math.floor(tx / CHUNK_SIZE);
+		var cy = Math.floor(ty / CHUNK_SIZE);
+
+		tx = tx % CHUNK_SIZE;
+		ty = ty % CHUNK_SIZE;
+
+		console.log(cx, cy, tx, ty);
 	}
 
 };
