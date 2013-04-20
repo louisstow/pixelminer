@@ -192,9 +192,6 @@ Inventory = {
 				quantity: 1
 			});
 		}
-
-		
-		console.log(inv, index);
 	},
 
 	dropItem: function (index) {

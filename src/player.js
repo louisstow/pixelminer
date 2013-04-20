@@ -52,18 +52,15 @@ function lineOfSight (sx, sy, ex, ey, reach, cb) {
 	reach *= reach; //square it so we can compare distance
 
 	for (; n > 0; --n) {
-		console.log("VISIT", x, y, n);
 
 		var dist = ((x - sx) * (x - sx)) + ((y - sy) * (y - sy));
 		if (dist > reach) {
-			console.log("PAST REACH", reach, dist);
 			return false;
 		}
 
 		//only visit one tile away
 		if (x !== sx && y !== sy) {
 			var val = cb(x, y);
-			console.log(val)
 			if (val) return val;
 		}
 
@@ -85,8 +82,8 @@ Input.onSelect(function (x, y) {
 
 	//check the first tile in the line of sight
 	var tile = lineOfSight(
-		Player.pixelX, 
-		Player.pixelY,
+		Player.pixelX + SIZE / 2, 
+		Player.pixelY + SIZE,
 		x,
 		y,
 		Player.reach * SIZE,
