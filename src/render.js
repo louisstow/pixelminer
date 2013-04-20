@@ -83,19 +83,6 @@ function generate (xref, yref) {
 	
 }
 
-var TileColor = [
-	null,
-	{r: 255, g: 88, b: 7}, //wood
-	{r: 150, g: 140, b: 140}, //stone
-	{r: 0, g: 186, b: 0}, //dirt
-	{r: 148, g: 104, b: 28}, //trunk
-	{r: 37, g: 122, b: 16}, //leaves
-	{r: 30, g: 20, b: 30}, //coal
-	{r: 180, g: 170, b: 80}, //gold
-	{r: 224, g: 27, b: 106}, //flower
-	{r: 57, g: 152, b: 36}, //stem
-	{r: 222, g: 242, b: 0} //tulip
-];
 
 /**
 * 1. Loop over every visible chunk
@@ -172,7 +159,10 @@ function renderObj (obj, x, y) {
 			//check the block exists in this chunk
 			var block = chunk[ox] && chunk[ox][oy];
 			
-			if (!block && !obj.color) { continue; }
+			//skip if no tile here
+			if (typeof block !== "number" && !obj.color) { 
+				continue; 
+			}
 			
 			var realx = obj.cx * CHUNK_SIZE + ox;
 			var realy = obj.cy * CHUNK_SIZE + oy;
@@ -180,7 +170,7 @@ function renderObj (obj, x, y) {
 			var pixelx = (realx - x) * SIZE;
 			var pixely = (realy - y) * SIZE;
 
-			var color = TileColor[block] || obj.color;
+			var color = Tile.get(block).color || obj.color;
 			//convert to hash, prob better to set to rgb()
 			if (typeof color === "object") {
 				color = "rgb(" + color.r + "," + color.g + "," + color.b + ")";

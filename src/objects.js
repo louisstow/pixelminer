@@ -20,7 +20,7 @@ var Generator = {
 			var endy = randRange(4, 6) | 0;
 			
 			for (; starty >= endy; --starty) {
-				matrix[startx + x - this.anchorX][starty + y - this.anchorY] = TileTypes.TRUNK;
+				matrix[startx + x - this.anchorX][starty + y - this.anchorY] = tileByName.TRUNK;
 			}
 
 			//start leaves
@@ -30,7 +30,7 @@ var Generator = {
 				for (starty = 0; starty < endy; ++starty) {
 					//leave some holes
 					if (Math.random() < 0.9) {
-						matrix[startx + x - this.anchorX][starty + y - this.anchorY] = TileTypes.LEAVES;					
+						matrix[startx + x - this.anchorX][starty + y - this.anchorY] = tileByName.LEAVES;					
 					}
 				}
 			}
@@ -41,7 +41,7 @@ var Generator = {
 
 	coal: {
 		template: [
-			[[TileTypes.COAL]]
+			[[tileByName.COAL]]
 		],
 		placement: ["ROCK"],
 		luck: 0.01
@@ -49,7 +49,7 @@ var Generator = {
 
 	gold: {
 		template: [
-			[[TileTypes.GOLD]]
+			[[tileByName.GOLD]]
 		],
 		placement: ["ROCK"],
 		luck: 0.001
@@ -57,8 +57,8 @@ var Generator = {
 
 	flower: {
 		template: [
-			[[TileTypes.ROSE, TileTypes.STEM]],
-			[[TileTypes.TULIP, TileTypes.STEM]]
+			[[tileByName.ROSE, tileByName.STEM]],
+			[[tileByName.TULIP, tileByName.STEM]]
 		],
 		placement: ["LAND"],
 		luck: 0.005,
@@ -73,9 +73,9 @@ var Generator = {
 		luck: 0.02,
 
 		template: [
-			[[TileTypes.STEM], [null, TileTypes.STEM]],
-			[[null, TileTypes.STEM], [TileTypes.STEM, null]],
-			[[TileTypes.STEM], [null, TileTypes.STEM], [TileTypes.STEM]]
+			[[tileByName.STEM], [null, tileByName.STEM]],
+			[[null, tileByName.STEM], [tileByName.STEM, null]],
+			[[tileByName.STEM], [null, tileByName.STEM], [tileByName.STEM]]
 		]	
 	}
 };

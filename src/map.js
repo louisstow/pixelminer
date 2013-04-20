@@ -155,10 +155,30 @@ var Map = {
 		var cx = Math.floor(tx / CHUNK_SIZE);
 		var cy = Math.floor(ty / CHUNK_SIZE);
 
-		tx = tx % CHUNK_SIZE;
-		ty = ty % CHUNK_SIZE;
+		var offsetx = tx - cx * CHUNK_SIZE;
+		var offsety = ty - cy * CHUNK_SIZE;
+		var key = cx + "," + cy;
 
-		console.log(cx, cy, tx, ty);
+		var obj2 = layer2[key][offsetx][offsety];
+		var obj1 = layer1[key][offsetx][offsety];
+
+		var data = {
+			key: key,
+			offsetx: offsetx,
+			offsety: offsety,
+		};
+
+		if (typeof obj2 === "number") {
+			data.layer = 2;
+			data.tile = obj2;
+			data.map = layer2;
+		} else if (typeof obj1 === "number") {
+			data.layer = 1;
+			data.tile = obj1;
+			data.map = layer1;
+		}
+
+		return data;
 	}
 
 };

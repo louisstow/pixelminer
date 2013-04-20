@@ -81,6 +81,18 @@ Inventory = {
 		this.selectQuick(this._selected);
 	},
 
+	/**
+	* Add an item to the inventory
+	* 1. See if the item exists in the quick bar and less than max and stackable
+	* 		a. increase quantity
+	* 2. See if empty slot in quick bar
+	*		a. add 1 item to slot
+	* 3. Find first stack in backpack to hold quantity
+	*		a. increase quantity
+	* 4. Find empty slot
+	* 		a. add 1 item to slot
+	* 5. Inventory full
+	*/
 	addItem: function (item, quantity) {
 		
 	},

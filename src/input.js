@@ -20,7 +20,6 @@ function onInput (e) {
 	//TODO: allow touch
 	var x = e.offsetX - 1;
 	var y = e.offsetY - 1;
-	console.log(e)
 	
 	Input.select(x, y);
 }
