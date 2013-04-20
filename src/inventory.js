@@ -60,9 +60,10 @@ var ItemView = Spineless.View.extend({
 var inventory = new InventoryView();
 
 Inventory = {
-	_items: [],
+	_backpack: [],
 	_quick: [],
 	_slots: 10,
+	_backpackSlots: 20,
 	_placeholder: [],
 	_selected: 0,
 
@@ -94,11 +95,89 @@ Inventory = {
 	* 5. Inventory full
 	*/
 	addItem: function (item, quantity) {
+		var len = this._slots;
+		var index = -1;
+		var empty = -1;
+		var i = 0;
+		var tile = Tile.get(item);
+		var stack = tile.stack || MAX_STACK;
+		var slot;
+
+		//loop through quick bar
+		for (; i < len; ++i) {
+			slot = this._quick[i];
+
+			//no item in the quick bar
+			if (!slot) {
+				//save this position as empty slot
+				if (empty === -1) {
+					empty = i;
+				}
+				continue;
+			}
+
+			//check if the item matches
+			if (slot.item === item && slot.quantity < stack) {
+				index = i;
+				break;
+			}
+		}
+
+		if (index !== -1) {
+			return this.addItemAtIndex(index, item, quantity);
+		}
+
+		if (empty !== -1) {
+			return this.addItemAtIndex(empty, item, quantity);
+		}
 		
+		//loop through backpack
+		len = this._backpackSlots;
+		for (i = 0; i < len; ++i) {
+			slot = this._backpack[i];
+
+			if (!slot) {
+				if (empty === -1) {
+					empty = i + this._slots;
+				}
+				continue;
+			}
+
+			if (slot.item === item && slot.quantity < stack) {
+				index = i + this._slots;
+				break;
+			}
+		}
+
+		if (index !== -1) {
+			return this.addItemAtIndex(index, item, quantity);
+		}
+
+		if (empty !== -1) {
+			return this.addItemAtIndex(empty, item, quantity);
+		}
 	},
 
-	addItemAtIndex: function (item, index, quantity) {
+	addItemAtIndex: function (index, item, quantity) {
+		var inv = this._quick;
+		if (index >= this._slots) {
+			index -= this._slots;
+			inv = this._backpack;
+		}
+		
+		//if it exists, increase the quantity
+		if (inv[index]) {
+			inv[index].quantity++;
+		} else {
+			//else, create item
+			inv[index] = {
+				item: item,
+				quantity: 1
+			};
+		}
 
+		
+		console.log(inv, index);
 	},
 
 	dropItem: function (index) {

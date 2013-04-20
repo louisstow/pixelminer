@@ -37,7 +37,11 @@ Input.onSelect(function (x, y) {
 	
 	if (distance < Player.reach) {
 		var tile = Map.getTileAtPoint(x, y);
-		Inventory.addItem(tile.tile, 1);
-		console.log(tile);
+		
+		if (typeof tile.tile === "number") {
+			Inventory.addItem(tile.tile, 1);
+			console.log(tile);	
+		}
+		
 	}
 });
