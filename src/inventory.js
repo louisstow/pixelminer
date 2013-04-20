@@ -34,7 +34,7 @@ var InventoryView = Spineless.View.extend({
 var ItemView = Spineless.View.extend({
 	defaults: {
 		index: 0,
-		color: "",
+		icon: "",
 		quantity: 0
 	},
 
@@ -57,9 +57,9 @@ var ItemView = Spineless.View.extend({
 	},
 
 	render: function () {
-		this.icon.style.background = this.model.color;
+		this.icon.className = "icon " + this.model.icon;
 		var text = "";
-		if (this.model.quantity > 0)
+		if (this.model.quantity > 1)
 			text = this.model.quantity;
 
 		this.icon.textContent = text;
@@ -169,7 +169,6 @@ Inventory = {
 
 	addItemAtIndex: function (index, item, quantity) {
 		var inv = this._quick;
-		var tileData = Tile.get(item);
 
 		if (index >= this._slots) {
 			index -= this._slots;
@@ -188,18 +187,8 @@ Inventory = {
 				quantity: 1
 			};
 
-			var color = [
-				"rgb(",
-				tileData.color.r,
-				",",
-				tileData.color.g,
-				",",
-				tileData.color.b,
-				")"
-			].join("")
-
 			this._placeholder[index].set({
-				color: color,
+				icon: Tile.getName(item).toLowerCase(),
 				quantity: 1
 			});
 		}

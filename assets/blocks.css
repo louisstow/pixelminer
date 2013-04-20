@@ -1,0 +1,23 @@
+.tulip {
+	background-position: 0 -32px;
+}
+
+.coal {
+	background-position: 0 0;
+}
+
+.rose {
+	background-position: -32px -32px;
+}
+
+.trunk {
+	background-position: -32px 0;
+}
+
+.stem {
+	background-position: -64px 0;
+}
+
+.leaves {
+	background-position: -96px 0;
+}

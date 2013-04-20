@@ -1,9 +1,9 @@
 var Tile = {
-	getById: function (id) {
+	getName: function (id) {
 		return tileById[id];		
 	},
 
-	getByName: function (name) {
+	getId: function (name) {
 		return tileByName[name];
 	},
 
