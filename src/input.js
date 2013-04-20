@@ -32,6 +32,11 @@ window.addEventListener("blur", function () {
 	Input.isDown = {};
 }, false);
 
+window.addEventListener("contextmenu", function (e) {
+	e.preventDefault();
+	return false;
+});
+
 var Input = {
 	_selectCb: [],
 

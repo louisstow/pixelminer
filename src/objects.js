@@ -52,7 +52,7 @@ var Generator = {
 			[[tileByName.GOLD]]
 		],
 		placement: ["ROCK"],
-		luck: 0.001
+		luck: 0.005
 	},
 
 	flower: {

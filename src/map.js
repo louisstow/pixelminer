@@ -62,9 +62,10 @@ var Map = {
 				var lvl = Terrain.generatePosition(realx, realy);
 				var layer = Terrain.getLayer(lvl);
 
-				var luck = Math.random();
+				
 
 				for (var objname in Generator) {
+					var luck = Math.random();
 					var obj = Generator[objname];
 					var w = obj.w = obj.width || 1;
 					var h = obj.h = obj.height || 1;
@@ -116,6 +117,8 @@ var Map = {
 						pixelY: (cy * CHUNK_SIZE + (y - ay)) * SIZE,
 						uuid: (Math.random() * 2000 | 0).toString(16)
 					});
+
+					break;
 				}
 			}
 		}
@@ -180,6 +183,8 @@ var Map = {
 			data.layer = 1;
 			data.tile = obj1;
 			data.map = layer1;
+		} else {
+			return false;
 		}
 
 		return data;
