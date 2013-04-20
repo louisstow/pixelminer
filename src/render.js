@@ -227,7 +227,8 @@ var offsety = 0;
 var speed = 2;
 
 
-var moved = true;
+var moved = false;
+var doDraw = false;
 
 Timer.tick(function () {
 	moved = false;
@@ -251,6 +252,8 @@ Timer.tick(function () {
 		Player.pixelY += speed;
 		moved = true;
 	}
+
+	if (moved) doDraw = true;
 });
 
 function getCurrentChunk () {
@@ -261,8 +264,9 @@ function getCurrentChunk () {
 }
 
 Timer.render(function () {
-	if (moved) {
+	if (doDraw) {
 		scrollTo();
+		doDraw = false;
 	}
 });
 

@@ -46,10 +46,24 @@ body {
 	margin: 8px 0 0px 7px;
 	background: #aaa;
 	box-shadow: 1px 1px 0 1px #eee;
+	position: relative;
 }
 
 #inventory .placeholder.active {
 	border: 2px solid #222;
 	margin-left: 4px;
 	margin-top: 6px;
+}
+
+#inventory .icon {
+	left: 8px;
+	top: 8px;
+	position: absolute;
+	height: 50px;
+	width: 50px;
+
+	line-height: 95px;
+	font-family: sans-serif;
+	text-shadow: -1px -1px 1px white;
+	text-align: right;
 }

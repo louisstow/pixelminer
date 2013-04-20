@@ -33,7 +33,9 @@ var InventoryView = Spineless.View.extend({
 
 var ItemView = Spineless.View.extend({
 	defaults: {
-		index: 0
+		index: 0,
+		color: "",
+		quantity: 0
 	},
 
 	template: [
@@ -46,14 +48,21 @@ var ItemView = Spineless.View.extend({
 		"click placeholder": "select"
 	},
 
-	select: function (e) {
+	select: function () {
 		this.placeholder.classList.add("active");
-		e && e.stopPropagation();
-		return false;
 	},
 
 	deselect: function () {
 		this.placeholder.classList.remove("active")	
+	},
+
+	render: function () {
+		this.icon.style.background = this.model.color;
+		var text = "";
+		if (this.model.quantity > 0)
+			text = this.model.quantity;
+
+		this.icon.textContent = text;
 	}
 });
 
@@ -160,6 +169,8 @@ Inventory = {
 
 	addItemAtIndex: function (index, item, quantity) {
 		var inv = this._quick;
+		var tileData = Tile.get(item);
+
 		if (index >= this._slots) {
 			index -= this._slots;
 			inv = this._backpack;
@@ -168,12 +179,29 @@ Inventory = {
 		//if it exists, increase the quantity
 		if (inv[index]) {
 			inv[index].quantity++;
+
+			this._placeholder[index].set("quantity", inv[index].quantity)
 		} else {
 			//else, create item
 			inv[index] = {
 				item: item,
 				quantity: 1
 			};
+
+			var color = [
+				"rgb(",
+				tileData.color.r,
+				",",
+				tileData.color.g,
+				",",
+				tileData.color.b,
+				")"
+			].join("")
+
+			this._placeholder[index].set({
+				color: color,
+				quantity: 1
+			});
 		}
 
 		

@@ -40,7 +40,8 @@ Input.onSelect(function (x, y) {
 		
 		if (typeof tile.tile === "number") {
 			Inventory.addItem(tile.tile, 1);
-			console.log(tile);	
+			Map.remove(tile.map, tile.key, tile.offsetx, tile.offsety);
+			doDraw = true;
 		}
 		
 	}

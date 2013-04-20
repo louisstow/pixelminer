@@ -38,6 +38,10 @@ var Map = {
 		}
 	},
 
+	remove: function (map, key, x, y) {
+		delete map[key][x][y];
+	},
+
 	generateTerrainChunk: function (key, cx, cy) {
 		var map = layer1[key] = [];
 		var metachunk = metadata[key] = [];
