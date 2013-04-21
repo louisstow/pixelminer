@@ -90,7 +90,7 @@ Input.on("start", function (x, y) {
 	y += Player.pixelY - half_screen_h;
 
 	//check the first tile in the line of sight
-	var tile = lineOfSight(
+	var location = lineOfSight(
 		Player.pixelX + SIZE / 2, 
 		Player.pixelY + SIZE,
 		x,
@@ -98,14 +98,14 @@ Input.on("start", function (x, y) {
 		Player.reach * SIZE,
 		Map.getTileAtPoint
 	);
-	
-	if (tile) {
-		var tileData = Tile.get(tile.tile);
+
+	if (location) {
+		var tileData = Tile.get(location.tile.id);
 
 		//must hold down
 		toDestroy = setTimeout(function () {
-			Inventory.addItem(tile.tile, 1);
-			Map.remove(tile.map, tile.key, tile.offsetx, tile.offsety);
+			Inventory.addItem(location.tile.id, 1);
+			Map.remove(location.map, location.key, location.offsetx, location.offsety);
 			doDraw = true;	
 		}, tileData.strength * 1000);
 	}

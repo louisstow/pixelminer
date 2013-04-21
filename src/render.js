@@ -160,7 +160,7 @@ function renderObj (obj, x, y) {
 			var block = chunk[ox] && chunk[ox][oy];
 			
 			//skip if no tile here
-			if (typeof block !== "number" && !obj.color) { 
+			if (!block && !obj.color) { 
 				continue; 
 			}
 			
@@ -170,7 +170,8 @@ function renderObj (obj, x, y) {
 			var pixelx = (realx - x) * SIZE;
 			var pixely = (realy - y) * SIZE;
 
-			var color = Tile.get(block).color || obj.color;
+			var color = Tile.get(block.id).color || obj.color;
+
 			//convert to hash, prob better to set to rgb()
 			if (typeof color === "object") {
 				color = "rgb(" + color.r + "," + color.g + "," + color.b + ")";

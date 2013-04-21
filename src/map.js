@@ -33,7 +33,10 @@ var Map = {
 	place: function (map, x, y, template, opts) {
 		for (var tx = 0; tx < template.length; ++tx) {
 			for (var ty = 0; ty < template[tx].length; ++ty) {
-				map[x + tx - (opts.anchorX || 0)][y + ty - (opts.anchorY || 0)] = template[tx][ty];
+				if (template[tx][ty] === null) { continue }
+				map[x + tx - (opts.anchorX || 0)][y + ty - (opts.anchorY || 0)] = {
+					id: template[tx][ty]
+				};
 			}
 		}
 	},
@@ -175,11 +178,11 @@ var Map = {
 			offsety: offsety,
 		};
 
-		if (typeof obj2 === "number") {
+		if (obj2) {
 			data.layer = 2;
 			data.tile = obj2;
 			data.map = layer2;
-		} else if (typeof obj1 === "number") {
+		} else if (obj1) {
 			data.layer = 1;
 			data.tile = obj1;
 			data.map = layer1;
