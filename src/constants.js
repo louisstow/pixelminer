@@ -16,8 +16,8 @@ var MAX_STACK = 32;
 var Key = {
 	A: 37,
 	LEFT: 65,
-	D: 29,
-	RIGHT: 68,
+	D: 68,
+	RIGHT: 39,
 	W: 38,
 	UP: 87,
 	S: 40,
