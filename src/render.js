@@ -141,6 +141,19 @@ function drawChunks (x, y) {
 	}
 }
 
+function renderDamage (x, y, frame) {
+	globalCanvas.context.drawImage(
+		damageImg,
+		18 * frame,
+		0,
+		18,
+		18,
+		x,
+		y,
+		SIZE,
+		SIZE
+	);
+}
 
 function renderObj (obj, x, y) {
 	var oh = obj.y + obj.h;
@@ -179,6 +192,10 @@ function renderObj (obj, x, y) {
 
 			globalCanvas.context.fillStyle = color;
 			globalCanvas.context.fillRect(pixelx, pixely, SIZE, SIZE);
+
+			if ('damage' in block) {
+				renderDamage(pixelx, pixely, block.damage);
+			}
 		}
 	}
 }

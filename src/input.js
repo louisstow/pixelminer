@@ -46,6 +46,17 @@ function no (e) {
 window.addEventListener("contextmenu", no, false);
 window.addEventListener("selectstart", no, false);
 
+
+
 var Input = new (Spineless.Event.extend({
 	isDown: {}
 }));
+
+window.addEventListener("DOMMouseScroll", onScroll, false);
+document.onmousewheel = onScroll;
+
+function onScroll (e) {
+	var delta = -e.detail || e.wheelDelta;
+	
+	Input.emit("scroll", delta);
+}

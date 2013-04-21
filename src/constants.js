@@ -1,6 +1,8 @@
 //setup the global canvas
 var globalCanvas = new Canvas({id: "canvas"})
 var stageElement = document.getElementById("stage");
+var damageImg = new Image();
+damageImg.src = "./assets/crack.png";
 
 var SIZE = 18;
 var w = 2 + globalCanvas.element.width / SIZE | 0;

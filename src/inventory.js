@@ -17,6 +17,14 @@ var InventoryView = Spineless.View.extend({
 			this.deselectQuick();
 			Inventory._selected = obj.model.index;
 		});
+
+		Input.on("scroll", function (delta) {
+			var inc = delta < 0 ? 1 : -1;
+			
+			Inventory._selected += inc;
+
+			Inventory.selectQuick(Inventory._selected);
+		}.bind(this));
 	},
 
 	selectQuick: function (index) {			

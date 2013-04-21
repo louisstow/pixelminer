@@ -84,6 +84,8 @@ function lineOfSight (sx, sy, ex, ey, reach, cb) {
 
 //keep the timer of the tile to destroy
 var toDestroy = null;
+var tileDestroy = null;
+var tweenFunc;
 
 Input.on("start", function (x, y) {
 	x += Player.pixelX - half_screen_w;
@@ -101,13 +103,40 @@ Input.on("start", function (x, y) {
 
 	if (location) {
 		var tileData = Tile.get(location.tile.id);
+		var timeout = tileData.strength * 1000;
 
 		//must hold down
 		toDestroy = setTimeout(function () {
 			Inventory.addItem(location.tile.id, 1);
 			Map.remove(location.map, location.key, location.offsetx, location.offsety);
 			doDraw = true;	
-		}, tileData.strength * 1000);
+		}, timeout);
+
+		var startTime = Date.now();
+		var timeInc = timeout / 5;
+		var futureTime = startTime + timeInc;
+		var damage = 0;
+
+		tileDestroy = location.tile;
+		tileDestroy.damage = 0;
+		doDraw = true;
+
+		tweenFunc = function () {
+			var now = Date.now();
+			if (now > futureTime) {
+				console.log(damage)
+				damage++;
+				futureTime = now + timeInc;
+				location.tile.damage = damage;
+				doDraw = true;
+			}
+
+			if (damage > 5) {
+				Timer.off("tick", tweenFunc);
+			}
+		};
+
+		Timer.on("tick", tweenFunc);
 	}
 });
 
@@ -117,5 +146,9 @@ Input.on("end", function (x, y) {
 	if (toDestroy !== null) {
 		clearTimeout(toDestroy);
 		toDestroy = null;
+		Timer.off("tick", tweenFunc);
+		delete tileDestroy.damage;
+		tileDestroy = null;
+		doDraw = true;
 	}
 });
