@@ -67,16 +67,25 @@ function lineOfSight (sx, sy, ex, ey, reach, cb) {
 		if (error > 0) {
 			x += x_inc;
 			error -= dy;
-		} else {
+		} else if (error < 0) {
 			y += y_inc;
 			error += dx;
+		} else {
+			x += x_inc;
+			error -= dy;
+			y += y_inc;
+			error += dx;
+			n--;
 		}
 	}
 
 	return false;
 }
 
-Input.onSelect(function (x, y) {
+//keep the timer of the tile to destroy
+var toDestroy = null;
+
+Input.on("start", function (x, y) {
 	x += Player.pixelX - half_screen_w;
 	y += Player.pixelY - half_screen_h;
 
@@ -91,8 +100,22 @@ Input.onSelect(function (x, y) {
 	);
 	
 	if (tile) {
-		Inventory.addItem(tile.tile, 1);
-		Map.remove(tile.map, tile.key, tile.offsetx, tile.offsety);
-		doDraw = true;
-	}	
+		var tileData = Tile.get(tile.tile);
+
+		//must hold down
+		toDestroy = setTimeout(function () {
+			Inventory.addItem(tile.tile, 1);
+			Map.remove(tile.map, tile.key, tile.offsetx, tile.offsety);
+			doDraw = true;	
+		}, tileData.strength * 1000);
+	}
+});
+
+Input.on("end", function (x, y) {
+	//if let go before the timeout,
+	//cancel the timeout
+	if (toDestroy !== null) {
+		clearTimeout(toDestroy);
+		toDestroy = null;
+	}
 });

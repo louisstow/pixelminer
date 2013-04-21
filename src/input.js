@@ -14,14 +14,20 @@ window.addEventListener("keydown", function (e) {
 }, false);
 
 globalCanvas.element.addEventListener("mousedown", onInput, false);
-globalCanvas.element.addEventListener("touchdown", onInput, false);
+globalCanvas.element.addEventListener("touchstart", onInput, false);
+globalCanvas.element.addEventListener("mouseup", onInput, false);
+globalCanvas.element.addEventListener("touchend", onInput, false);
 
 function onInput (e) {
+	var type = e.type.replace(/mouse|touch/ig, '');
+	if (type === "down") type = "start";
+	if (type === "up") type = "end";
+
 	//TODO: allow touch
 	var x = e.offsetX - 1;
 	var y = e.offsetY - 1;
 	
-	Input.select(x, y);
+	Input.emit(type, x, y);
 }
 
 window.addEventListener("keyup", function (e) {
@@ -32,24 +38,14 @@ window.addEventListener("blur", function () {
 	Input.isDown = {};
 }, false);
 
-window.addEventListener("contextmenu", function (e) {
+function no (e) {
 	e.preventDefault();
 	return false;
-});
-
-var Input = {
-	_selectCb: [],
-
-	isDown: {},
-
-	onSelect: function (cb) {
-		this._selectCb.push(cb);
-	},
-
-	select: function (x, y) {
-		var l = this._selectCb.length;
-		while (l--) {
-			this._selectCb[l](x, y);
-		}
-	}
 }
+
+window.addEventListener("contextmenu", no, false);
+window.addEventListener("selectstart", no, false);
+
+var Input = new (Spineless.Event.extend({
+	isDown: {}
+}));
