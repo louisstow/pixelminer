@@ -113,7 +113,7 @@ Input.on("start", function (x, y) {
 		}, timeout);
 
 		var startTime = Date.now();
-		var timeInc = timeout / 5;
+		var timeInc = timeout / CRACK_FRAMES;
 		var futureTime = startTime + timeInc;
 		var damage = 0;
 
@@ -131,7 +131,7 @@ Input.on("start", function (x, y) {
 				doDraw = true;
 			}
 
-			if (damage > 5) {
+			if (damage > CRACK_FRAMES) {
 				Timer.off("tick", tweenFunc);
 			}
 		};

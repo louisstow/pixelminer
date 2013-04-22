@@ -14,6 +14,7 @@ var screen_h = globalCanvas.element.height;
 var half_screen_w = screen_w / 2 | 0;
 var half_screen_h = screen_h / 2 | 0;
 var MAX_STACK = 32;
+var CRACK_FRAMES = 8;
 
 var Key = {
 	A: 37,
