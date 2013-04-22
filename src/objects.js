@@ -20,7 +20,9 @@ var Generator = {
 			var endy = randRange(4, 6) | 0;
 			
 			for (; starty >= endy; --starty) {
-				matrix[startx + x - this.anchorX][starty + y - this.anchorY] = tileByName.TRUNK;
+				matrix[startx + x - this.anchorX][starty + y - this.anchorY] = {
+					id: tileByName.TRUNK
+				};
 			}
 
 			//start leaves
@@ -30,7 +32,9 @@ var Generator = {
 				for (starty = 0; starty < endy; ++starty) {
 					//leave some holes
 					if (Math.random() < 0.9) {
-						matrix[startx + x - this.anchorX][starty + y - this.anchorY] = tileByName.LEAVES;					
+						matrix[startx + x - this.anchorX][starty + y - this.anchorY] = {
+							id: tileByName.LEAVES
+						};
 					}
 				}
 			}

@@ -67,21 +67,32 @@ function lineOfSight (sx, sy, ex, ey, reach, cb) {
 		if (error > 0) {
 			x += x_inc;
 			error -= dy;
-		} else {
+		} else if (error < 0) {
 			y += y_inc;
 			error += dx;
+		} else {
+			x += x_inc;
+			error -= dy;
+			y += y_inc;
+			error += dx;
+			n--;
 		}
 	}
 
 	return false;
 }
 
-Input.onSelect(function (x, y) {
+//keep the timer of the tile to destroy
+var toDestroy = null;
+var tileDestroy = null;
+var tweenFunc;
+
+Input.on("start", function (x, y) {
 	x += Player.pixelX - half_screen_w;
 	y += Player.pixelY - half_screen_h;
 
 	//check the first tile in the line of sight
-	var tile = lineOfSight(
+	var location = lineOfSight(
 		Player.pixelX + SIZE / 2, 
 		Player.pixelY + SIZE,
 		x,
@@ -89,10 +100,55 @@ Input.onSelect(function (x, y) {
 		Player.reach * SIZE,
 		Map.getTileAtPoint
 	);
-	
-	if (tile) {
-		Inventory.addItem(tile.tile, 1);
-		Map.remove(tile.map, tile.key, tile.offsetx, tile.offsety);
+
+	if (location) {
+		var tileData = Tile.get(location.tile.id);
+		var timeout = tileData.strength * 1000;
+
+		//must hold down
+		toDestroy = setTimeout(function () {
+			Inventory.addItem(location.tile.id, 1);
+			Map.remove(location.map, location.key, location.offsetx, location.offsety);
+			doDraw = true;	
+		}, timeout);
+
+		var startTime = Date.now();
+		var timeInc = timeout / CRACK_FRAMES;
+		var futureTime = startTime + timeInc;
+		var damage = 0;
+
+		tileDestroy = location.tile;
+		tileDestroy.damage = 0;
 		doDraw = true;
-	}	
+
+		tweenFunc = function () {
+			var now = Date.now();
+			if (now > futureTime) {
+				console.log(damage)
+				damage++;
+				futureTime = now + timeInc;
+				location.tile.damage = damage;
+				doDraw = true;
+			}
+
+			if (damage > CRACK_FRAMES) {
+				Timer.off("tick", tweenFunc);
+			}
+		};
+
+		Timer.on("tick", tweenFunc);
+	}
+});
+
+Input.on("end", function (x, y) {
+	//if let go before the timeout,
+	//cancel the timeout
+	if (toDestroy !== null) {
+		clearTimeout(toDestroy);
+		toDestroy = null;
+		Timer.off("tick", tweenFunc);
+		delete tileDestroy.damage;
+		tileDestroy = null;
+		doDraw = true;
+	}
 });
