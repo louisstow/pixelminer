@@ -87,7 +87,7 @@ var toDestroy = null;
 var tileDestroy = null;
 var tweenFunc;
 
-Input.on("start", function (x, y) {
+Input.on("start:left", function (x, y) {
 	x += Player.pixelX - half_screen_w;
 	y += Player.pixelY - half_screen_h;
 
@@ -140,7 +140,11 @@ Input.on("start", function (x, y) {
 	}
 });
 
-Input.on("end", function (x, y) {
+Input.on("start:right", function (x, y) {
+
+});
+
+Input.on("end:*", function (x, y) {
 	//if let go before the timeout,
 	//cancel the timeout
 	if (toDestroy !== null) {

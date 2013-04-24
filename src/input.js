@@ -23,11 +23,14 @@ function onInput (e) {
 	if (type === "down") type = "start";
 	if (type === "up") type = "end";
 
+	var button = "left";
+	if (e.which === 3 || e.button === 2) { button = "right"; }
+
 	//TODO: allow touch
 	var x = e.offsetX - 1;
 	var y = e.offsetY - 1;
 	
-	Input.emit(type, x, y);
+	Input.emit(type + ":" + button, x, y);
 }
 
 window.addEventListener("keyup", function (e) {
@@ -45,8 +48,6 @@ function no (e) {
 
 window.addEventListener("contextmenu", no, false);
 window.addEventListener("selectstart", no, false);
-
-
 
 var Input = new (Spineless.Event.extend({
 	isDown: {}

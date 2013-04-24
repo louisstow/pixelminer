@@ -142,6 +142,7 @@ function drawChunks (x, y) {
 }
 
 function renderDamage (x, y, frame) {
+	globalCanvas.context.globalAlpha = 0.5;
 	globalCanvas.context.drawImage(
 		damageImg,
 		18 * frame,
@@ -153,6 +154,7 @@ function renderDamage (x, y, frame) {
 		SIZE,
 		SIZE
 	);
+	globalCanvas.context.globalAlpha = 1;
 }
 
 function renderObj (obj, x, y) {
