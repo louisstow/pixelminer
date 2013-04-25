@@ -22,11 +22,6 @@ var inc = 500; //increment the day
 var divider = day / 24; //divide into 24 hours
 var overlay = document.getElementById("time").style;
 
-//interpolate the color values
-function lerp (start, end, v) {
-	return start + (end - start) * v;
-}
-
 function renderTime () {
 	time += inc;
 	time = time % day;

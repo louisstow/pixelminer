@@ -160,37 +160,24 @@ var Map = {
 	},
 
 	getTileAtPoint: function (x, y) {
-		var tx = Math.floor(x / SIZE);
-		var ty = Math.floor(y / SIZE);
-		var cx = Math.floor(tx / CHUNK_SIZE);
-		var cy = Math.floor(ty / CHUNK_SIZE);
+		var pos = Convertor.px2chunk(x, y);
 
-		var offsetx = tx - cx * CHUNK_SIZE;
-		var offsety = ty - cy * CHUNK_SIZE;
-		var key = cx + "," + cy;
-
-		var obj2 = layer2[key][offsetx][offsety];
-		var obj1 = layer1[key][offsetx][offsety];
-
-		var data = {
-			key: key,
-			offsetx: offsetx,
-			offsety: offsety,
-		};
+		var obj2 = layer2[pos.key][pos.x][pos.y];
+		var obj1 = layer1[pos.key][pos.x][pos.y];
 
 		if (obj2) {
-			data.layer = 2;
-			data.tile = obj2;
-			data.map = layer2;
+			pos.layer = 2;
+			pos.tile = obj2;
+			pos.map = layer2;
 		} else if (obj1) {
-			data.layer = 1;
-			data.tile = obj1;
-			data.map = layer1;
+			pos.layer = 1;
+			pos.tile = obj1;
+			pos.map = layer1;
 		} else {
 			return false;
 		}
 
-		return data;
+		return pos;
 	}
 
 };

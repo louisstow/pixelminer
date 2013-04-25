@@ -8,14 +8,17 @@ var Player = {
 	pixelW: SIZE,
 	pixelH: SIZE * 3,
 
+	canMove: true,
+
 	reach: 5, //how many tiles can the player reach
+	speed: 2, //speed of the player in pixels per tick
 
 	player: true,
 
 	draw: function (ctx) {
-		var startx = half_screen_w - offsetx;
-		var starty = half_screen_h - offsety;
-		//console.log(startx, offsetx, starty, offsety)
+		var startx = half_screen_w - Renderer.offsetx;
+		var starty = half_screen_h - Renderer.offsety;
+		
 		ctx.fillStyle = "red";
 		ctx.fillRect(startx, starty, SIZE, SIZE);
 
@@ -24,72 +27,59 @@ var Player = {
 
 		ctx.fillStyle = "grey";
 		ctx.fillRect(startx, starty + SIZE * 2, SIZE, SIZE);
+	},
+
+	allowMove: function () {
+		this.canMove = true;
+	},
+
+	stopMove: function () {
+		this.canMove = false;
 	}
 }
 
-/**
-* lineOfSight
-* sx - start x
-* sy - start y
-* ex - end x
-* ey - end y
-*/
-function lineOfSight (sx, sy, ex, ey, reach, cb) {
-	var dx = Math.abs(ex - sx);
-	var dy = Math.abs(ey - sy);
+var moved = false;
+Timer.tick(function () {
+	moved = false;
 
-	var x = sx;
-	var y = sy;
+	if (!Player.canMove) return;
 
-	var x_inc = (ex > sx) ? 1 : -1;
-	var y_inc = (ey > sy) ? 1 : -1;
-
-	var n = 1 + dx + dy;
-	var error = dx - dy;
-	dx *= 2;
-	dy *= 2;
-
-	reach *= reach; //square it so we can compare distance
-
-	for (; n > 0; --n) {
-
-		var dist = ((x - sx) * (x - sx)) + ((y - sy) * (y - sy));
-		if (dist > reach) {
-			return false;
-		}
-
-		//only visit one tile away
-		if (x !== sx && y !== sy) {
-			var val = cb(x, y);
-			if (val) return val;
-		}
-
-		if (error > 0) {
-			x += x_inc;
-			error -= dy;
-		} else if (error < 0) {
-			y += y_inc;
-			error += dx;
-		} else {
-			x += x_inc;
-			error -= dy;
-			y += y_inc;
-			error += dx;
-			n--;
-		}
+	if (Input.isDown[Key.A] || Input.isDown[Key.LEFT]) {
+		Player.pixelX -= Player.speed;
+		moved = true;
 	}
 
-	return false;
-}
+	if (Input.isDown[Key.D] || Input.isDown[Key.RIGHT]) {
+		Player.pixelX += Player.speed;
+		moved = true;
+	}
+
+	if (Input.isDown[Key.W] || Input.isDown[Key.UP]) {
+		Player.pixelY -= Player.speed;
+		moved = true;
+	}
+
+	if (Input.isDown[Key.S] || Input.isDown[Key.DOWN]) {
+		Player.pixelY += Player.speed;
+		moved = true;
+	}
+
+	if (moved) {
+		Renderer.needsRender();
+	}
+});
+
+
 
 //keep the timer of the tile to destroy
 var toDestroy = null;
 var tileDestroy = null;
 var tweenFunc;
+var emitter;
 
-Input.on("start:left", function (x, y) {
-	x += Player.pixelX - half_screen_w;
-	y += Player.pixelY - half_screen_h;
+Input.on("start:left", function (screenx, screeny) {
+	var x = screenx + Player.pixelX - half_screen_w;
+	var y = screeny + Player.pixelY - half_screen_h;
 
 	//check the first tile in the line of sight
 	var location = lineOfSight(
@@ -105,35 +95,41 @@ Input.on("start:left", function (x, y) {
 		var tileData = Tile.get(location.tile.id);
 		var timeout = tileData.strength * 1000;
 
+		//get the position on the screen
+		var position = Convertor.chunk2px(
+			location.cx, 
+			location.cy,
+			location.x, 
+			location.y
+		);
+
+		emitter = new ParticleEmitter();
+		emitter.start({
+			maxParticles: 7,
+			color: tileData.color,
+			spread: 30,
+			x: position.x + SIZE / 2,
+			y: position.y,
+			life: 4,
+			gravity: {x: 0, y: 0.2}
+		});
+
+		Player.stopMove();
+
 		//must hold down
 		toDestroy = setTimeout(function () {
 			Inventory.addItem(location.tile.id, 1);
-			Map.remove(location.map, location.key, location.offsetx, location.offsety);
-			doDraw = true;	
+			Map.remove(location.map, location.key, location.x, location.y);
+			doDraw = true;
+			stopMining();
 		}, timeout);
 
-		var startTime = Date.now();
-		var timeInc = timeout / CRACK_FRAMES;
-		var futureTime = startTime + timeInc;
-		var damage = 0;
-
-		tileDestroy = location.tile;
-		tileDestroy.damage = 0;
-		doDraw = true;
-
 		tweenFunc = function () {
-			var now = Date.now();
-			if (now > futureTime) {
-				console.log(damage)
-				damage++;
-				futureTime = now + timeInc;
-				location.tile.damage = damage;
-				doDraw = true;
-			}
-
-			if (damage > CRACK_FRAMES) {
-				Timer.off("tick", tweenFunc);
-			}
+			//emitter.removeParticles(1);
+			emitter.tick();
+			effectCanvas.clear();
+			effectCanvas.context.globalAlpha = 0.5;
+			emitter.render(effectCanvas.context);
 		};
 
 		Timer.on("tick", tweenFunc);
@@ -144,15 +140,22 @@ Input.on("start:right", function (x, y) {
 
 });
 
+function stopMining () {
+	clearTimeout(toDestroy);
+	
+	emitter.destroy(function () {
+		Timer.off("tick", tweenFunc);
+		Player.allowMove()
+	});
+	
+	Renderer.needsRender();
+	toDestroy = null;
+}
+
 Input.on("end:*", function (x, y) {
 	//if let go before the timeout,
 	//cancel the timeout
 	if (toDestroy !== null) {
-		clearTimeout(toDestroy);
-		toDestroy = null;
-		Timer.off("tick", tweenFunc);
-		delete tileDestroy.damage;
-		tileDestroy = null;
-		doDraw = true;
+		stopMining();
 	}
 });

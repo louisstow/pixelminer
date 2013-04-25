@@ -69,5 +69,15 @@ var Terrain = {
 
 		if (n < threshold.SNOW)
 			return "SNOW";
+	},
+
+	colors: {
+		"DEEP_WATER": {r: 44, g: 131, b: 235},
+		"WATER": {r: 54, g: 141, b: 255},
+		"SHALLOW_WATER": {r: 146, g: 180, b: 255},
+		"BEACH": {r: 255, g: 231, b: 54},
+		"LAND": {r: 100, g: 200, b: 50},
+		"ROCK": {r: 118, g: 118, b: 118},
+		"SNOW": {r: 220, g: 230, b: 245}
 	}
 }

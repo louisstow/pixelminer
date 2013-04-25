@@ -1,5 +1,6 @@
 //setup the global canvas
 var globalCanvas = new Canvas({id: "canvas"})
+var effectCanvas = new Canvas({id: "effects"})
 var stageElement = document.getElementById("stage");
 var damageImg = new Image();
 damageImg.src = "./assets/crack.png";

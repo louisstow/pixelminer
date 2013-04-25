@@ -25,6 +25,15 @@ var Canvas = function (opts) {
 		this.context.mozImageSmoothingEnabled = false;
 		this.context.imageSmoothingEnabled = false;
 	}
+
+	this.clear = function () {
+		this.context.clearRect(
+			0,
+			0,
+			this.element.width,
+			this.element.height
+		);
+	}
 };
 
 exports = Canvas;

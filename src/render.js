@@ -1,296 +1,231 @@
+//pre randomize noise values
 var noise = [];
 for (var x = 0; x < 50; ++x) {
 	noise[x] = Math.random();
 }
 
+//render to an offscreen canvas
 var offscreen = new Canvas({
 	width: w,
 	height: h
 });
 
-offscreen.element.id = "minimap";
-document.getElementById("stage").appendChild(offscreen.element);
-
 var imgData = offscreen.context.createImageData(w, h);
 var data = imgData.data;
 
-function generate (xref, yref) {
-	var shift = Math.random() * 200 | 0;
-	for (var x = 0; x < w; ++x) {
-		for (var y = 0; y < h; ++y) {
-			//generate normalized position
-			var lvl = Terrain.generatePosition(x + xref, y + yref);
-
-			var index = (y * w + x) * 4;
-			
-			var gen = lvl * 255 | 0;
-			var r = gen, b = gen, g = gen;
-
-			var deepblue = 70;
-			var blue = deepblue + 40;
-			var lightblue = blue + 10;
-			var beach = lightblue + 10;
-			var grass = beach + 30;
-			var brown = grass + 30;
-			
-			if (lvl < Terrain.threshold.DEEP_WATER) { //deep blue
-				r = 44;
-				g = 131;
-				b = 235;
-			} else if (lvl < Terrain.threshold.WATER) { //blue
-				r = 54;
-				g = 141;
-				b = 255;
-			} else if (lvl < Terrain.threshold.SHALLOW_WATER) { //light blue
-				r = 146;
-				g = 180;
-				b = 255;
-			} else if (lvl < Terrain.threshold.BEACH) { //beach
-				r = 255;
-				g = 231;
-				b = 54;			
-			} else if (lvl < Terrain.threshold.LAND) { //grass
-				r = 100;
-				g = 200;
-				b = 50;
-			} else if (lvl < Terrain.threshold.ROCK) { //brown
-				r = 118;
-				g = 118;
-				b = 118;
-			} else if (lvl < Terrain.threshold.SNOW) { //snow
-				r = 245;
-				g = 220;
-				b = 209;
-			}
-			
-			var diff = lvl * 150 - 75;
-
-			var noisekey = Math.abs((x + xref) * (y + yref)) % noise.length;
-			var dither = noise[noisekey] * 10 - 5;
-
-			data[index] = (r + diff + dither);
-			data[++index] = (g + diff  + dither);
-			data[++index] = (b + diff + dither);
-			data[++index] = 255;
-		}
-	}
-
-	
-
-	offscreen.context.putImageData(imgData, 0, 0);
-	globalCanvas.context.drawImage(offscreen.element, 0, 0, w, h, 0, 0, w * SIZE, h * SIZE);
-	
-	
-}
-
-
-/**
-* 1. Loop over every visible chunk
-* 2. Create draw-list include the player obj
-* 3. Sort the draw-list by y + h
-* 4. Loop draw-list, loop the layer from start (x0,y0) to end (x1,y1)
-* 5. Render each tile with a fillRect
-*/
-function drawChunks (x, y) {
-	//top left chunk
-	var cx0 = Math.floor(x / CHUNK_SIZE);
-	var cy0 = Math.floor(y / CHUNK_SIZE);
-
-	//bottom right chunk
-	var cx1 = Math.floor((x + w) / CHUNK_SIZE);
-	var cy1 = Math.floor((y + h) / CHUNK_SIZE);
-
-	var drawList = [];
-
-	//all the chunks inbetween
-	for (var cx = cx0; cx <= cx1; ++cx) {
-		for (var cy = cy0; cy <= cy1; ++cy) {
-			Map.getChunk(1, cx, cy);
-
-			//clone the draw list 
-			var copy = Map.getMetadata(cx, cy);
-
-			for (var i = 0; i < copy.length; ++i) {
-				var obj = copy[i];
-				//console.log(obj.realx)
-				if (obj.pixelX + obj.pixelW < (Player.pixelX - half_screen_w) ||
-					obj.pixelY + obj.pixelH < (Player.pixelY - half_screen_h) ||
-					obj.pixelX > (Player.pixelX + half_screen_w) ||
-					obj.pixelY > (Player.pixelY + half_screen_h)) {
-					continue;
-				}
-				drawList.push(obj);
-			}
-
-			//only add to the list ONCE
-			if (!Player.drawn) {
-				drawList.push(Player);
-				Player.drawn = true;
-			}
-		}
-	}
-
-	//sort based on pixel position
-	drawList.sort(function (a, b) {
-		return (a.pixelY + a.pixelH) - (b.pixelY + b.pixelH);
-	});
-
-	//console.log(drawList.length)
-	for (var i = 0; i < drawList.length; ++i) {
-		renderObj(drawList[i], x, y);
-	}
-}
-
-function renderDamage (x, y, frame) {
-	globalCanvas.context.globalAlpha = 0.5;
-	globalCanvas.context.drawImage(
-		damageImg,
-		18 * frame,
-		0,
-		18,
-		18,
-		x,
-		y,
-		SIZE,
-		SIZE
-	);
-	globalCanvas.context.globalAlpha = 1;
-}
-
-function renderObj (obj, x, y) {
-	var oh = obj.y + obj.h;
-	var ow = obj.x + obj.w;
-	
-	//execute the draw function instead
-	if (typeof obj.draw === "function") {
-		obj.draw(globalCanvas.context);
-		return;
-	}
-
-	var chunk = Map.getChunk(1, obj.cx, obj.cy);
-
-	for (var ox = obj.x; ox < ow; ++ox) {
-		for (var oy = obj.y; oy < oh; ++oy) {
-			//check the block exists in this chunk
-			var block = chunk[ox] && chunk[ox][oy];
-			
-			//skip if no tile here
-			if (!block && !obj.color) { 
-				continue; 
-			}
-			
-			var realx = obj.cx * CHUNK_SIZE + ox;
-			var realy = obj.cy * CHUNK_SIZE + oy;
-
-			var pixelx = (realx - x) * SIZE;
-			var pixely = (realy - y) * SIZE;
-
-			var color = Tile.get(block.id).color || obj.color;
-
-			//convert to hash, prob better to set to rgb()
-			if (typeof color === "object") {
-				color = "rgb(" + color.r + "," + color.g + "," + color.b + ")";
-			}
-
-			globalCanvas.context.fillStyle = color;
-			globalCanvas.context.fillRect(pixelx, pixely, SIZE, SIZE);
-
-			if ('damage' in block) {
-				renderDamage(pixelx, pixely, block.damage);
-			}
-		}
-	}
-}
-
-function scrollTo () {
-	var doRender = false;
-	var x = Player.pixelX - half_screen_w;
-	var y = Player.pixelY - half_screen_h;
-
-	if (Math.floor(x / SIZE) !== currentx) {
-		currentx = Math.floor(x / SIZE);
-		doRender = true;
-	}
-
-	if (Math.floor(y / SIZE) !== currenty) {
-		currenty = Math.floor(y / SIZE);
-		doRender = true;
-	}
-	
-	if (doRender) { 
-		generate(currentx, currenty); 
-	}
-
-	Player.drawn = false;
-	
-	var modx = x % SIZE;
-	var mody = y % SIZE;
-
-	offsetx = -1 * ((SIZE + modx) % SIZE);
-	offsety = -1 * ((SIZE + mody) % SIZE);
-
-	globalCanvas.context.save();
-	globalCanvas.context.translate(offsetx, offsety);
-	globalCanvas.context.drawImage(offscreen.element, 0, 0, w, h, 0, 0, w * SIZE, h * SIZE);
-
-	drawChunks(currentx, currenty);
-	globalCanvas.context.restore();
-}
-
+//top left absolute tile position
 var currentx = 0;
 var currenty = 0;
-var scrollx = 0;
-var scrolly = 0;
-var offsetx = 0;
-var offsety = 0;
 
-var speed = 2;
+/**
+* Main Renderer object
+*/
+var Renderer = {
+	doDraw: true,
 
+	needsRender: function () {
+		Renderer.doDraw = true;
+	},
 
-var moved = false;
-var doDraw = false;
+	offsetx: 0,
+	offsety: 0,
 
-Timer.tick(function () {
-	moved = false;
+	/**
+	* Generate a chunk of terrain and render
+	* to an offscreen canvas.
+	*/
+	generate: function (xref, yref) {
+		for (var x = 0; x < w; ++x) {
+			for (var y = 0; y < h; ++y) {
+				//generate normalized position
+				var lvl = Terrain.generatePosition(x + xref, y + yref);
 
-	if (Input.isDown[Key.A] || Input.isDown[Key.LEFT]) {
-		Player.pixelX -= speed;
-		moved = true;
+				var index = (y * w + x) * 4;
+				
+				//grab the color
+				var terrain = Terrain.getLayer(lvl);
+				var color = Terrain.colors[terrain];
+				
+				var diff = lvl * 150 - 75;
+
+				var noisekey = Math.abs((x + xref) * (y + yref)) % noise.length;
+				var dither = noise[noisekey] * 10 - 5;
+
+				data[index] = (color.r + diff + dither);
+				data[++index] = (color.g + diff  + dither);
+				data[++index] = (color.b + diff + dither);
+				data[++index] = 255;
+			}
+		}
+
+		offscreen.context.putImageData(imgData, 0, 0);
+		globalCanvas.context.drawImage(offscreen.element, 0, 0, w, h, 0, 0, w * SIZE, h * SIZE);
+	},
+
+	/**
+	* Render every chunk visible in the viewport
+	* and all the objects inside it.
+	*/
+	renderChunks: function (x, y) {
+		//top left chunk
+		var cx0 = Math.floor(x / CHUNK_SIZE);
+		var cy0 = Math.floor(y / CHUNK_SIZE);
+
+		//bottom right chunk
+		var cx1 = Math.floor((x + w) / CHUNK_SIZE);
+		var cy1 = Math.floor((y + h) / CHUNK_SIZE);
+
+		var drawList = [];
+
+		//all the chunks inbetween
+		for (var cx = cx0; cx <= cx1; ++cx) {
+			for (var cy = cy0; cy <= cy1; ++cy) {
+				Map.getChunk(1, cx, cy);
+
+				//clone the draw list 
+				var copy = Map.getMetadata(cx, cy);
+
+				for (var i = 0; i < copy.length; ++i) {
+					var obj = copy[i];
+					//console.log(obj.realx)
+					if (obj.pixelX + obj.pixelW < (Player.pixelX - half_screen_w) ||
+						obj.pixelY + obj.pixelH < (Player.pixelY - half_screen_h) ||
+						obj.pixelX > (Player.pixelX + half_screen_w) ||
+						obj.pixelY > (Player.pixelY + half_screen_h)) {
+						continue;
+					}
+
+					drawList.push(obj);
+				}
+
+				//only add to the list ONCE
+				if (!Player.drawn) {
+					drawList.push(Player);
+					Player.drawn = true;
+				}
+			}
+		}
+
+		//sort based on pixel position
+		drawList.sort(function (a, b) {
+			return (a.pixelY + a.pixelH) - (b.pixelY + b.pixelH);
+		});
+
+		//render the draw list in order
+		for (var i = 0; i < drawList.length; ++i) {
+			Renderer.renderObj(drawList[i], x, y);
+		}
+	},
+
+	/**
+	* Render individual objects
+	*/
+	renderObj: function (obj, x, y) {
+		var oh = obj.y + obj.h;
+		var ow = obj.x + obj.w;
+		
+		//execute the draw function instead
+		if (typeof obj.draw === "function") {
+			obj.draw(globalCanvas.context);
+			return;
+		}
+
+		var chunk = Map.getChunk(1, obj.cx, obj.cy);
+
+		for (var ox = obj.x; ox < ow; ++ox) {
+			for (var oy = obj.y; oy < oh; ++oy) {
+				//check the block exists in this chunk
+				var block = chunk[ox] && chunk[ox][oy];
+				
+				//skip if no tile here
+				if (!block && !obj.color) { 
+					continue; 
+				}
+				
+				var realx = obj.cx * CHUNK_SIZE + ox;
+				var realy = obj.cy * CHUNK_SIZE + oy;
+
+				var pixelx = (realx - x) * SIZE;
+				var pixely = (realy - y) * SIZE;
+
+				var color = Tile.get(block.id).color || obj.color;
+
+				//convert to hash, prob better to set to rgb()
+				if (typeof color === "object") {
+					color = "rgb(" + color.r + "," + color.g + "," + color.b + ")";
+				}
+
+				globalCanvas.context.fillStyle = color;
+				globalCanvas.context.fillRect(pixelx, pixely, SIZE, SIZE);
+			}
+		}
+	},
+
+	/**
+	* Main render function. Handles the smooth
+	* scrolling values and determines what
+	* to regenerate.
+	*/
+	render: function () {
+		var doRender = false;
+		var x = Player.pixelX - half_screen_w;
+		var y = Player.pixelY - half_screen_h;
+
+		//check if we're in a new tile
+		if (Math.floor(x / SIZE) !== currentx) {
+			currentx = Math.floor(x / SIZE);
+			doRender = true;
+		}
+
+		if (Math.floor(y / SIZE) !== currenty) {
+			currenty = Math.floor(y / SIZE);
+			doRender = true;
+		}
+		
+		//if so, generate that terrain position first
+		if (doRender) { 
+			Renderer.generate(currentx, currenty); 
+		}
+
+		//reset the player
+		Player.drawn = false;
+		
+		var modx = x % SIZE;
+		var mody = y % SIZE;
+		var offsetx = -1 * ((SIZE + modx) % SIZE);
+		var offsety = -1 * ((SIZE + mody) % SIZE);
+		Renderer.offsetx = offsetx;
+		Renderer.offsety = offsety;
+
+		//draw the offscreen canvas to the main canvas
+		globalCanvas.context.save();
+		globalCanvas.context.translate(offsetx, offsety);
+		globalCanvas.context.drawImage(
+			offscreen.element, 
+			0, 
+			0, 
+			w, 
+			h, 
+			0, 
+			0, 
+			w * SIZE, 
+			h * SIZE
+		);
+
+		//render all the objects on top
+		Renderer.renderChunks(currentx, currenty);
+		globalCanvas.context.restore();
 	}
+};
 
-	if (Input.isDown[Key.D] || Input.isDown[Key.RIGHT]) {
-		Player.pixelX += speed;
-		moved = true;
-	}
-
-	if (Input.isDown[Key.W] || Input.isDown[Key.UP]) {
-		Player.pixelY -= speed;
-		moved = true;
-	}
-
-	if (Input.isDown[Key.S] || Input.isDown[Key.DOWN]) {
-		Player.pixelY += speed;
-		moved = true;
-	}
-
-	if (moved) doDraw = true;
-});
-
-function getCurrentChunk () {
-	console.log(
-		Math.floor(currentx / CHUNK_SIZE),
-		Math.floor(currenty / CHUNK_SIZE)
-	);
-}
 
 Timer.render(function () {
-	if (doDraw) {
-		scrollTo();
-		doDraw = false;
+	if (Renderer.doDraw) {
+		Renderer.render();
+		Renderer.doDraw = false;
 	}
 });
-
 
 //initalisiation stuff
 Timer.start();
-scrollTo();
+Renderer.render();
