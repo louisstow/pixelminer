@@ -39,7 +39,7 @@ var Player = {
 }
 
 var moved = false;
-Timer.tick(function () {
+Timer.on("tick", function () {
 	moved = false;
 
 	if (!Player.canMove) return;

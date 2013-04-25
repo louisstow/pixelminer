@@ -17,6 +17,8 @@ var maxFrameSkip = 2; //maximum frames to drop
 var nextGameTick = Date.now();
 var lastGameTick = null;
 
+var currentFrame = 0;
+
 var Timer = new (Spineless.Event.extend({
 	FPS: FPS,
 	_ticks: [],
@@ -35,44 +37,11 @@ var Timer = new (Spineless.Event.extend({
 	},
 
 	step: function() {
-		loops = 0;
 		var now = Date.now();
 
-		while (now > nextGameTick && loops < maxFrameSkip) {
-			Timer.doTick(now - lastGameTick);
-			this.emit("tick", now - lastGameTick);
-			nextGameTick += skipTicks;
-			lastGameTick = now;
-			loops++;
-		}
+		this.emit("tick", now - lastGameTick, ++currentFrame);
+		lastGameTick = now;
 
-		if (loops >= maxFrameSkip) {
-			nextGameTick = now;
-		}
-
-		if (loops) {
-			Timer.doRender();
-			this.emit("render");
-		}
-	},
-
-	tick: function (cb) {
-		this._ticks.push(cb);
-	},
-
-	render: function (cb) {
-		this._renders.push(cb);	
-	},
-
-	doTick: function (dt) {
-		for (var i = 0, l = this._ticks.length; i < l; ++i) {
-			this._ticks[i](dt);
-		}
-	},
-
-	doRender: function () {
-		for (var i = 0, l = this._renders.length; i < l; ++i) {
-			this._renders[i]();
-		}
+		this.emit("render");
 	}
 }));

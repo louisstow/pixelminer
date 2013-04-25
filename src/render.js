@@ -219,7 +219,7 @@ var Renderer = {
 };
 
 
-Timer.render(function () {
+Timer.on("render", function () {
 	if (Renderer.doDraw) {
 		Renderer.render();
 		Renderer.doDraw = false;
